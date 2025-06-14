@@ -10,3 +10,6 @@ node_modules/
 .specstory/history/**
 **/.DS_Store
 .specstory/**
+
+# Service account credentials
+sa-key.json
