@@ -1,22 +1,25 @@
-# YouTube MindMap Generator
+# SaaS Template
 
-Transform YouTube videos into interactive mind maps with just a URL! This project uses FastAPI backend and React frontend to create beautiful, interactive mindmaps from YouTube video content.
+A complete, production-ready SaaS template built with modern technologies. Get started building your next SaaS product with authentication, user management, dashboard, and more - all included out of the box.
 
 ## 🚀 Features
 
-- **Generate Mind Maps from YouTube URLs**: Simply paste any YouTube video URL and get a structured mind map of the content
-- **Interactive Visualization**: Explore the mind map with pan and zoom controls
-- **Smart Summarization**: AI-powered summarization of video content
-- **Key Takeaways**: Automatically extract the most important points
-- **Multiple Detail Levels**: Choose between different levels of detail
-- **Multi-language Support**: Generate mind maps in different languages
-- **Save & Share**: Save your mind maps and share them with others
+- **Complete Authentication System**: User registration, login, password reset, email verification
+- **Modern React Frontend**: Built with React 18, TypeScript, TanStack Router, and Chakra UI
+- **FastAPI Backend**: Scalable Python backend with automatic API documentation
+- **Database Ready**: PostgreSQL with SQLModel/SQLAlchemy and Alembic migrations
+- **User Management**: Profile management, user settings, admin functionality
+- **Multi-language Support**: i18next integration for internationalization
+- **Dark/Light Mode**: Built-in theme switching with Chakra UI
+- **Email System**: Transactional emails with customizable templates
+- **Production Ready**: Docker containerization and deployment scripts
+- **Developer Experience**: Type-safe API client generation, comprehensive testing
 
 ## 📋 Prerequisites
 
 - [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
 - [Node.js](https://nodejs.org/) (v18+)
-- [Python](https://www.python.org/) (v3.9+)
+- [Python](https://www.python.org/) (v3.10+)
 
 ## 🛠️ Quick Start
 
@@ -26,8 +29,8 @@ The easiest way to get started is with Docker:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/youtube-mindmap.git
-cd youtube-mindmap
+git clone https://github.com/yourusername/saas-template.git
+cd saas-template
 
 # Start all services
 docker-compose up -d
@@ -74,50 +77,71 @@ npm install
 npm run dev
 ```
 
-## 🧠 How to Use
+## 🎯 What's Included
 
-1. Open your browser and navigate to http://localhost:3000
-2. Sign up or log in to your account
-3. Click on "Create New Mindmap"
-4. Paste a YouTube URL in the input field
-5. Select your preferences (language, detail level, etc.)
-6. Click "Generate MindMap"
-7. Wait for the mind map to be generated
-8. Explore your mind map!
+### Backend (FastAPI)
+- **Authentication**: JWT-based auth with refresh tokens
+- **User Management**: Registration, login, profile management
+- **API Documentation**: Automatic Swagger/ReDoc generation
+- **Database**: PostgreSQL with SQLModel/SQLAlchemy
+- **Email**: Transactional email system
+- **Testing**: Comprehensive test suite
+- **Security**: CORS, rate limiting, input validation
 
-## 📖 Example
+### Frontend (React)
+- **Modern Stack**: React 18, TypeScript, Vite
+- **Routing**: TanStack Router with type-safe navigation
+- **State Management**: TanStack Query for server state
+- **UI Components**: Chakra UI component library
+- **Forms**: React Hook Form with validation
+- **Internationalization**: i18next for multi-language support
+- **Theme**: Dark/light mode with system preference detection
 
+### Infrastructure
+- **Containerization**: Docker and Docker Compose setup
+- **Database**: PostgreSQL with connection pooling
+- **Environment**: Configurable environment variables
+- **Deployment**: Production-ready deployment scripts
+- **Monitoring**: Health checks and logging
+
+## 🧪 Usage Examples
+
+### Creating a New Feature
+
+1. **Add Backend API**:
+```python
+# backend/app/api/routes/your_feature.py
+@router.post("/", response_model=YourFeaturePublic)
+async def create_feature(
+    *, session: SessionDep, feature_in: YourFeatureCreate, current_user: CurrentUser
+) -> Any:
+    feature = YourFeature.model_validate(
+        {**feature_in.model_dump(), "user_id": current_user.id}
+    )
+    session.add(feature)
+    session.commit()
+    session.refresh(feature)
+    return feature
 ```
-# Original YouTube video
-https://www.youtube.com/watch?v=7j_NE6Pjv-E
 
-# Generated MindMap
-- Mindfulness Meditation (Root)
-  - Benefits of Meditation (2:15)
-    - Reduced Stress (3:42)
-    - Improved Focus (5:18)
-    - Better Sleep (8:30)
-  - Mindfulness Techniques (10:45)
-    - Body Scan (12:30)
-    - Breath Awareness (14:20)
-    - Loving-kindness (18:50)
-  - Daily Practice Tips (22:15)
-    - Morning Routine (23:40)
-    - Mindful Eating (26:15)
-    - Evening Wind-down (28:30)
+2. **Add Frontend Component**:
+```tsx
+// frontend/src/components/YourFeature/YourFeature.tsx
+export const YourFeature: React.FC = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['yourFeature'],
+    queryFn: () => YourFeatureService.getFeatures(),
+  });
+
+  if (isLoading) return <Spinner />;
+  
+  return (
+    <Box>
+      {/* Your component content */}
+    </Box>
+  );
+};
 ```
-
-## 🧪 Jupyter Notebook Integration
-
-While this project offers a comprehensive web application for generating mind maps from YouTube videos, you might find that using a Jupyter Notebook provides more flexibility and customization options for your specific needs. 
-
-Jupyter notebooks allow you to:
-- Run custom code to process the video transcripts
-- Create your own visualizations
-- Integrate with other data sources
-- Apply advanced natural language processing techniques
-
-> 📝 **Note**: For advanced users or researchers, a Jupyter Notebook approach might offer more powerful capabilities than our web application.
 
 ## 📚 API Documentation
 
@@ -130,11 +154,29 @@ Once the backend is running, you can access the API documentation at:
 Configuration is done through environment variables. See `.env.example` files in both backend and frontend directories.
 
 Key configurations:
-- `AI_API_KEY`: Your OpenAI or other AI provider API key
-- `AI_MODEL_NAME`: AI model to use for generating mindmaps
 - `DATABASE_URL`: PostgreSQL connection string
 - `SECRET_KEY`: Secret key for JWT token generation
 - `CORS_ORIGINS`: Allowed origins for CORS
+- `EMAIL_*`: Email service configuration
+- `VITE_API_URL`: Backend API URL for frontend
+
+## 🚀 Deployment
+
+### Using Docker
+
+```bash
+# Build and deploy
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+### Cloud Deployment
+
+The template includes deployment configurations for:
+- Google Cloud Platform (GCP)
+- AWS (coming soon)
+- Azure (coming soon)
+
+See the `deploy_gcp/` directory for GCP-specific deployment scripts.
 
 ## 🤝 Contributing
 
@@ -155,23 +197,38 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [FastAPI](https://fastapi.tiangolo.com/) for the backend framework
 - [React](https://reactjs.org/) for the frontend library
 - [Chakra UI](https://chakra-ui.com/) for the UI components
-- [Markmap](https://markmap.js.org/) for mind map visualization
-- [YouTube Transcript API](https://github.com/jdepoix/youtube-transcript-api) for fetching video transcripts
+- [TanStack](https://tanstack.com/) for routing and state management
+- [SQLModel](https://sqlmodel.tiangolo.com/) for database ORM
 
+## 📊 Architecture
 
-### Backend logs (continuous)
-gcloud compute ssh try@mindtube-server --zone us-central1-a --project tranquil-buffer-459009-r5 --tunnel-through-iap --command 'cd /home/try/code/my-fastapi-app && sudo docker compose logs -f backend'
+```
+├── backend/                 # FastAPI backend
+│   ├── app/
+│   │   ├── api/            # API routes
+│   │   │   ├── core/           # Core functionality
+│   │   │   ├── models.py       # Database models
+│   │   │   └── main.py         # Application entry point
+│   │   ├── tests/              # Backend tests
+│   │   └── alembic/            # Database migrations
+│   ├── frontend/               # React frontend
+│   │   ├── src/
+│   │   │   ├── components/     # React components
+│   │   │   ├── routes/         # Application routes
+│   │   │   ├── hooks/          # Custom hooks
+│   │   │   └── utils/          # Utility functions
+│   │   └── tests/              # Frontend tests
+│   ├── deploy_gcp/             # GCP deployment configs
+│   └── terraform/              # Infrastructure as code
+└── docker-compose.yml      # Development environment
+```
 
-### Frontend logs (continuous) 
-gcloud compute ssh try@mindtube-server --zone us-central1-a --project tranquil-buffer-459009-r5 --tunnel-through-iap --command 'cd /home/try/code/my-fastapi-app && sudo docker compose logs -f frontend'
+## 🔮 What's Next?
 
-### All services logs (continuous)
-gcloud compute ssh try@mindtube-server --zone us-central1-a --project tranquil-buffer-459009-r5 --tunnel-through-iap --command 'cd /home/try/code/my-fastapi-app && sudo docker compose logs -f'
-
-### VM system logs
-gcloud logging tail --resource-type=gce_instance --resource-id=mindtube-server --project=tranquil-buffer-459009-r5
-
-### All logs for your project
-gcloud logging tail --project=tranquil-buffer-459009-r5
-
-gcloud compute ssh try@mindtube-server --zone us-central1-a --project tranquil-buffer-459009-r5 --tunnel-through-iap --command 'cd /home/try/code/my-fastapi-app && sudo docker compose logs -f backend'
+This template is actively maintained and improved. Upcoming features:
+- Payment integration (Stripe)
+- Email marketing integration
+- Advanced admin dashboard
+- Multi-tenancy support
+- Real-time notifications
+- API rate limiting dashboard

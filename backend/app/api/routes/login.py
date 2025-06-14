@@ -1,17 +1,16 @@
 from datetime import timedelta
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
-import jwt
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import crud
-from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser, get_current_user
+from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
-from app.models import Message, NewPassword, Token, TokenPayload, User, UserPublic
+from app.models import Message, NewPassword, Token, User, UserPublic
 from app.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
@@ -41,58 +40,6 @@ def login_access_token(
         access_token=security.create_access_token(
             user.id, expires_delta=access_token_expires
         )
-    )
-
-
-@router.get("/extension-auth")
-def extension_auth(
-    session: SessionDep,
-    request: Request
-) -> JSONResponse:
-    """
-    Provide authentication token to Chrome extension
-    
-    This endpoint is called by the Chrome extension to get the current user's token.
-    It checks if there's a valid session and returns a token if the user is authenticated.
-    """
-    cors_headers = {
-        "Access-Control-Allow-Origin": "*",  
-        "Access-Control-Allow-Methods": "GET, OPTIONS, POST",
-        "Access-Control-Allow-Headers": "Authorization, Content-Type",
-    }
-    
-    try:
-        # Try to get current user from Authorization header if present
-        authorization = request.headers.get("Authorization")
-        if authorization and authorization.startswith("Bearer "):
-            token = authorization.split(" ")[1]
-            try:
-                payload = jwt.decode(
-                    token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-                )
-                token_data = TokenPayload(**payload)
-                user = session.get(User, token_data.sub)
-                if user and user.is_active:
-                    # User is authenticated, create a new token
-                    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-                    new_token = security.create_access_token(
-                        user.id, expires_delta=access_token_expires
-                    )
-                    return JSONResponse(
-                        content={"token": new_token, "user_id": user.id, "status": "success"},
-                        headers=cors_headers
-                    )
-            except Exception:
-                # Token is invalid, fall through to unauthenticated case
-                pass
-    except Exception:
-        # Any error in getting authorization header, fall through to unauthenticated case
-        pass
-    
-    # No valid authentication found
-    return JSONResponse(
-        content={"token": None, "status": "unauthorized", "message": "No valid authentication found"},
-        headers=cors_headers
     )
 
 

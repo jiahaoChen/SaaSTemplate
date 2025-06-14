@@ -4,8 +4,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/extension/dist/**
-/extension/release/**
 .DS_Store
 .specstory/history/**
 **/.DS_Store

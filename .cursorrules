@@ -31,526 +31,119 @@ Don't run the application, I will test by myself.
 
 # Scratchpad
 
-## Fix TypeScript Errors in Frontend
-
-[X] Fix UserMenu.tsx - change "settings" to "/settings"
-[X] Fix Landing.tsx - replace invalid route links with plain text elements
-[X] Fix MindMapNavbar.tsx - fix all invalid route links
-[X] Fix MindMapFooter.tsx - fix all invalid route links  
-[X] Fix MindMapLibrary.tsx - fix dynamic route links using proper TanStack Router syntax
-[X] Fix PublicMindMapLibrary.tsx - fix dynamic route links using proper TanStack Router syntax
-[X] Fix Signup.tsx - replace RouterLink to "#" with plain text elements
-[X] Remove unused React imports and React.FC type annotations
-[X] Fix MindMapSettings.tsx - handle unused mindMapId parameter
-[X] Fix CTA.tsx - remove invalid /features route
-[X] Fix Hero.tsx - fix spacing prop and Button component issues
-[X] Fix Testimonials.tsx - remove unused Testimonial component and fix imports
-[X] Fix Switch.tsx - resolve Chakra UI component compatibility issues
-[X] Complete build verification - all TypeScript errors resolved
-
-**Task**: Fix multiple TypeScript errors in the frontend codebase including invalid route links, unused variables, and component type issues.
-
-**Key Changes Made**:
-1. **Route Fixes**: Changed `/mindmap/detail/${id}` to `/mindmap/detail/$id` with `params={{ id: id.toString() }}` for proper TanStack Router dynamic route handling
-2. **Invalid Routes**: Replaced non-existent routes like `/features`, `/pricing`, `/mindmap/features` etc. with plain text elements or existing routes
-3. **Route Corrections**: Fixed route paths to use existing routes (e.g., `/mindmap/login` → `/login`, `/mindmap/signup` → `/signup`)
-4. **Unused Variables**: Removed unused React imports and simplified component type annotations (React.FC → direct function types)
-5. **Link Fixes**: Replaced RouterLink to "#" with Text components for terms/privacy links
-
-**Routes Fixed**:
-- UserMenu: "settings" → "/settings"
-- Landing: Removed links to `/features`, `/pricing`, `/testimonials`, `/faq`
-- MindMapNavbar: Fixed `/mindmap/*` routes, replaced invalid links with text
-- MindMapFooter: Fixed `/mindmap/*` routes, kept valid `/help` route
-- MindMap Libraries: Fixed dynamic routes using proper params syntax
-- Signup: Replaced "#" links with clickable text elements
-
-**COMPLETED**: All TypeScript errors have been successfully resolved. The frontend now builds without any errors and has:
-- Proper type safety throughout the codebase
-- Valid route navigation using TanStack Router
-- Clean component structure without unused imports
-- Fixed Chakra UI component compatibility issues
-- Successful production build verification
-
-The application is now ready for development and deployment with full TypeScript compliance.
-
-## Replace YouTube Transcript API with yt-dlp
-
-[X] Analyze the problem with youtube-transcript-api (XML parsing errors)
-[X] Update pyproject.toml to replace youtube-transcript-api with yt-dlp dependency
-[X] Rewrite get_youtube_transcript function to use yt-dlp for subtitle extraction
-[X] Implement VTT content parsing to extract timestamps and text
-[X] Handle both manual and automatic captions with language preferences
-[X] Test the new implementation successfully
-[X] Update .cursorrules with lessons learned about yt-dlp implementation
-
-The YouTube transcript API issue has been resolved by replacing youtube-transcript-api with yt-dlp:
-
-1. **Dependency Update**: Replaced `youtube-transcript-api<1.0.0,>=0.6.1` with `yt-dlp<2025.0.0,>=2024.12.0` in pyproject.toml
-
-2. **New Implementation**: Completely rewrote the `get_youtube_transcript` function to use yt-dlp:
-   - Uses yt-dlp to download VTT subtitle files
-   - Handles both manual and automatic captions
-   - Supports multiple language preferences with fallback logic
-   - Implements proper VTT content parsing with timestamp extraction
-
-3. **Key Features**:
-   - More robust and stable than youtube-transcript-api
-   - Better handling of YouTube's changing API
-   - Support for both quick_check and full processing modes
-   - Proper error handling and logging
-   - Maintains same API interface for backward compatibility
-
-4. **Test Results**: Successfully tested with video ID jNQXAC9IVRw, extracted 6 transcript entries with proper timestamps
-
-The implementation resolves the "no element found: line 1, column 0" XML parsing errors that were occurring with the old youtube-transcript-api.
-
-## Fix YouTube Transcript API Error Handling
-
-[X] Examine the youtube_transcript_api library to understand the error better
-[X] Improve error handling in get_youtube_transcript function  
-[X] Add more specific error messages for different transcript API failures
-[X] Add fallback or retry mechanisms for transient failures
-[X] Update the frontend to show more helpful error messages
-
-The YouTube transcript API error handling has been significantly improved:
-
-1. **Specific Exception Handling**: Added handling for all youtube_transcript_api exceptions:
-   - NoTranscriptFound, TranscriptsDisabled, VideoUnavailable
-   - TooManyRequests, CouldNotRetrieveTranscript, InvalidVideoId
-   - YouTubeRequestFailed, NoTranscriptAvailable
-   - xml.etree.ElementTree.ParseError (for empty XML responses)
-
-2. **Multiple Language Fallbacks**: Implemented retry logic with different language combinations:
-   - ["en", "zh", "es"] (original)
-   - ["en"] (English only)
-   - ["en-US", "en-GB"] (specific English variants)
-   - ["zh-CN", "zh-TW"] (Chinese variants)
-   - ["es", "pt", "fr"] (other common languages)
-
-3. **Better Error Messages**: Updated error messages to be more user-friendly and informative, explaining possible causes like:
-   - Video doesn't have captions/subtitles
-   - Transcripts disabled by creator
-   - Video is private or unavailable
-   - YouTube temporarily blocking requests
-
-4. **Smart Retry Logic**: Some errors (like VideoUnavailable, InvalidVideoId) immediately stop retrying since they won't succeed with different languages, while others (like CouldNotRetrieveTranscript) try other language combinations.
-
-The specific error "no element found: line 1, column 0" was caused by YouTube returning empty XML responses, which is now properly handled with xml.etree.ElementTree.ParseError catching.
-
-## Fix API Response for Videos Without Transcripts
-
-[X] Modified the mindmap creation endpoint to validate transcript availability upfront
-[X] Added get_youtube_transcript import to the routes module  
-[X] Changed behavior so API returns 400 error instead of 200 success when no transcript is available
-[X] Added user-friendly error message explaining why the video can't be processed
-[X] Added quick_check parameter for faster validation during API endpoint checks
-[X] Updated background processing to use full language combination retry logic
-
-Now when a video doesn't have transcripts, the API will return an HTTP 400 error with the message: "This video does not have transcripts/subtitles available. Please try with a different video that has captions enabled." instead of creating a "successful" mindmap with an error message.
-
-The implementation uses a two-tier approach:
-- **API Validation (quick_check=True)**: Fast validation with basic language combinations for immediate user feedback
-- **Background Processing (quick_check=False)**: Full retry logic with all language combinations for comprehensive processing
-
-## Add Video Play/Pause Controls to Extension
-
-[X] Add play and pause buttons to iframe HTML with Font Awesome icons
-[X] Add CSS styling for button states (hidden/visible) and hover effects
-[X] Add JavaScript event listeners for play/pause buttons in iframe
-[X] Add message handlers in content script for PLAY_VIDEO and PAUSE_VIDEO
-[X] Implement playVideo() and pauseVideo() functions with multiple fallback methods
-[X] Add video status monitoring to sync button states with actual video playback
-[X] Add UPDATE_VIDEO_STATUS message handling in iframe
-[X] Start video status monitoring when mindmap is displayed
-[X] Test video control functionality and status synchronization
-
-The video play/pause control implementation has been completed with:
-
-1. **UI Components**: Added play and pause buttons to the iframe button group with proper Chinese tooltips
-2. **Styling**: Added CSS for button visibility states and proper dark mode support
-3. **Communication**: Implemented message passing between iframe and content script
-4. **Video Control**: Created robust playVideo/pauseVideo functions with multiple fallback methods:
-   - YouTube Player API (ytPlayer.playVideo/pauseVideo)
-   - Direct video element control (video.play/pause)
-   - Button clicking simulation
-5. **Status Synchronization**: Added automatic monitoring of video playing state to keep buttons in sync
-6. **Error Handling**: Comprehensive fallback methods ensure compatibility across different YouTube layouts
-
-The buttons now:
-- Control YouTube video playback from the mindmap interface
-- Automatically sync with manual video controls (spacebar, click, etc.)
-- Show correct play/pause state based on actual video status
-- Work with various YouTube player implementations and layouts
-
-## Environment Variable Configuration for Extension
-
-[X] Analyze current build configuration and API URL setup
-[X] Modify webpack.config.js to inject environment variables
-[X] Update content.js to use environment-based API URL
-[X] Update other relevant files (background.js, popup.js) if they use API URL
-[ ] Test build process for both development and production modes (requires Node.js environment)
-[X] Update package.json scripts if needed
-[X] Create build instructions for users
-[X] Improve error handling for authentication flow
-
-The task is now completed! The extension has been configured to use different API URLs based on the build mode:
-- Development: http://localhost:8000/api/v1
-- Production: https://api.mindtube.duckdns.org/api/v1
-
-Changes made:
-1. Modified webpack.config.js to use DefinePlugin for environment variables
-2. Updated content.js, background.js, and popup.js to use process.env.API_BASE_URL
-3. Added FRONTEND_URL environment variable support for complete configuration
-4. Improved error handling for "No token available" case to provide better UX
-
-Build commands:
-- Development: `npm run dev` (for development with watch mode)
-- Production: `npm run build` (creates production build with correct API URLs)
-- Package: `npm run package` (builds and creates zip file for release)
-
-## Fix Public Mindmap Access Issue
-
-[X] Identify the issue with accessing shared mindmaps (403 Forbidden error)
-[X] Find that the read_mindmap endpoint in backend does not check if a mindmap is public
-[X] Modify read_mindmap function to allow any authenticated user to view public mindmaps
-[X] Test that users can now view mindmaps shared to the public library
-[X] Update IMPLEMENTATION_GUIDE.md with information about the fix
-
-The issue with public mindmaps has been fixed by:
-1. Modifying the read_mindmap endpoint in the backend to check if a mindmap is public
-2. Adding a logical OR condition to the permission check to allow access if the mindmap is public
-3. Updating the function docstring to clearly indicate the three access cases
-4. Updating the implementation guide to document the change
-
-## Fix SQLAlchemy Database Connection Issue
-
-[X] Identify the issue with SQLAlchemy connection error
-[X] Find that SQLAlchemy expects a string URL but is receiving a MultiHostUrl object
-[X] Modify the SQLALCHEMY_DATABASE_URI property in config.py to return a string instead of a MultiHostUrl object
-[X] Update db.py to use the string URL directly without str() conversion
-[X] Remove unnecessary imports (PostgresDsn, MultiHostUrl) from config.py
-[X] Add a lesson about this fix to .cursorrules
-
-The database connection issue has been fixed by:
-1. Changing the SQLALCHEMY_DATABASE_URI property to return a formatted string instead of a MultiHostUrl object
-2. Removing the unnecessary str() conversion in db.py
-3. Removing unused imports from config.py
-4. Adding a lesson about this fix to .cursorrules
-
-## Add Color Mode Toggle to Authentication Pages
-
-[X] Add ColorModeButton to login.tsx page
-[X] Add ColorModeButton to signup.tsx page
-[X] Position toggle button next to LanguageSwitcher for consistent UI
-[X] Ensure text and other elements adapt to dark/light mode
-[X] Fix translation issues in signup page
-[X] Fix passwordRules function parameter type issue
-
-The color mode toggle integration has been completed by:
-1. Importing ColorModeButton from the color-mode component
-2. Adding the button to both login and signup pages in the same position
-3. Testing dark/light mode transitions on authentication pages
-4. Ensuring all components maintain proper contrast and readability in both modes
-5. Making sure all text is translated properly across both pages and modes
-
-## Fix Login and Signup Pages Dark Mode Issues
-
-[X] Identify dark mode color issues on login and signup pages
-[X] Find that login page was using hardcoded colors instead of useColorModeValue
-[X] Update login.tsx to use useColorModeValue for all colors and background
-[X] Update signup.tsx to match the same dark mode implementation
-[X] Fix linter errors related to navigation syntax and mutation property names
-[X] Add new dark mode lesson to .cursorrules
-
-The dark mode issues have been fixed by:
-1. Adding useColorModeValue imports to login and signup pages
-2. Replacing all hardcoded colors with dynamic color values that change based on theme
-3. Implementing consistent styling for backgrounds, text, inputs, and interactive elements
-4. Ensuring proper contrast in both light and dark modes
-5. Updating the border colors and hover states to work correctly in dark mode
-
-## Fixed Sidebar Navigation Not Updating When Using Links Within Pages
-
-[X] Identified issue with sidebar navigation not updating when clicking links within pages
-[X] Found that the DashboardSidebar component wasn't properly tracking route changes
-[X] Refactored the useEffect hook in DashboardSidebar to better handle route detection
-[X] Added proper subscription to router's 'onResolved' event
-[X] Added function to detect active link from paths for better code organization
-[X] Added proper cleanup of subscription on component unmount
-
-The issue with the sidebar navigation has been fixed by:
-1. Refactoring the route detection logic into a reusable function
-2. Subscribing to the router's 'onResolved' event (proper event name from @tanstack/react-router)
-3. Correctly updating the active link state when navigating within pages
-4. Adding proper unsubscribe cleanup to prevent memory leaks
-5. Fixing path detection to correctly handle all navigation scenarios
-
-## Fix YouTube Player Not Displaying on First Load
-
-[X] Identify the YouTube player initialization issue in VideoPlayer component
-[X] Implement more robust initialization with API availability checks
-[X] Add loading indicator while player is initializing
-[X] Handle errors during player initialization
-[X] Update types to properly include onError event
-
-The YouTube player issue has been fixed by:
-1. Adding checks to verify YouTube API is fully loaded before attempting player creation
-2. Adding a check to ensure the player container element exists 
-3. Adding a loading spinner indicator during initialization
-4. Improving error handling to prevent crashes
-5. Adding proper type definitions for YouTube player events
-
-## Fix Chakra UI Icons Spinner Import Error
-
-[X] Create a custom SpinnerIcon component with correct imports
-[X] Check how Spinner is used throughout the application
-[X] Create a patch solution using patch-package
-
-The issue with the Chakra UI SpinnerIcon has been fixed by:
-1. Modifying the import in node_modules/@chakra-ui/icons/dist/esm/Spinner.mjs to import forwardRef from 'react' instead of '@chakra-ui/react'
-2. Creating a patch using patch-package
-3. Adding a postinstall script to package.json to automatically apply the patch after npm install 
-
-## Add Multi-Language Support
-
-[X] Identify existing i18n setup and language files
-[X] Analyze current language implementation structure
-[X] Update profile.tsx to use i18n translations for all UI text
-[X] Add missing translation keys to English and Chinese language files
-[X] Integrate language switcher on profile page
-[X] Update settings.tsx page to also support internationalization
-[X] Add lesson about i18n implementation to .cursorrules
-
-The multi-language implementation has been completed by:
-1. Adding the useLanguage hook for accessing translations
-2. Using the t() function for all UI text elements
-3. Adding necessary translation keys to both language files
-4. Including the LanguageSwitcher component in profile and settings pages
-5. Ensuring consistent naming and organization of translation keys
-6. Adding a lesson about i18n implementation best practices to .cursorrules 
-
-## Add Multi-Language Support to UserSettings Components
-
-[X] Add internationalization to UserInformation.tsx
-[X] Add internationalization to DeleteAccount.tsx
-[X] Add internationalization to DeleteConfirmation.tsx
-[X] Add internationalization to Appearance.tsx
-[X] Add internationalization to ChangePassword.tsx
-[X] Add new translation keys to English translation file
-[X] Add matching translation keys to Chinese translation file
-
-The UserSettings components internationalization has been completed by:
-1. Importing useLanguage hook in all components
-2. Replacing all hardcoded text with t() function calls
-3. Creating hierarchical translation keys for settings components (e.g., settings.userInformation.title)
-4. Adding appropriate translations for form labels, buttons, and messages
-5. Adding special handling for HTML formatting in confirmation messages
-6. Ensuring consistent translation structure between English and Chinese files 
-
-## Fix HTML tags not rendering in translations
-
-[X] Identify the issue in DeleteConfirmation component where HTML tags were being displayed as text
-[X] Replace Text component with Box component using dangerouslySetInnerHTML
-[X] Create a utility function renderHtmlTranslation for consistent handling across the app
-[X] Add the function to the utils.ts file
-[X] Update the component to use the new utility function
-[X] Add a lesson about HTML in i18n to the Cursor learned section
-
-The HTML rendering issue has been fixed by:
-1. Replacing the Text component with a Box component using dangerouslySetInnerHTML
-2. Creating a utility function renderHtmlTranslation in utils.ts
-3. Updating the DeleteConfirmation component to use the new utility
-4. Adding documentation for the utility function
-5. Adding a lesson about handling HTML in i18n translations to .cursorrules
-
-The issue was caused by HTML tags in the translation string being treated as literal text instead of being rendered as HTML. This is a common issue with i18n libraries where the HTML content needs special handling to be properly rendered. 
-
-## Fix UserInformation Select and Button Components
-
-[X] Identify the issue with the Select component in UserInformation.tsx
-[X] Find that the Select import from "@chakra-ui/react" was causing type errors
-[X] Replace Chakra UI Select with a native HTML select element styled properly
-[X] Fix the Button component's colorPalette prop by replacing it with colorScheme
-[X] Add proper useColorModeValue import from custom color-mode component
-[X] Update .cursorrules with lessons about Chakra UI component compatibility
-
-The UserInformation component issues have been fixed by:
-1. Replacing the Chakra UI Select component with a native HTML select element
-2. Styling the native select to match the existing UI design
-3. Fixing the Button component by changing colorPalette to colorScheme
-4. Ensuring correct import for useColorModeValue from custom components
-5. Adding a new lesson about Select component compatibility issues to .cursorrules 
-
-## Fix Gemini API Quota Error Handling
-
-[X] Identify the issue with Gemini API quota errors not being displayed to the user
-[X] Improve error handling in the backend to detect and format quota errors
-[X] Update the frontend to display API errors clearly to the user
-[X] Add error UI with retry button in the processing screen
-[X] Add translation keys for error messages in both English and Chinese
-[X] Add lesson about API quota error handling to .cursorrules
-
-The Gemini API quota error handling has been fixed by:
-1. Enhancing the backend error detection to specifically identify quota errors (HTTP 429)
-2. Formatting error messages to be more user-friendly
-3. Adding a clear error display in the frontend processing UI
-4. Implementing a retry button to allow users to try again
-5. Adding proper internationalization for error messages
-6. Making sure the error state is visually distinct with appropriate styling 
-
-## Fix Extension Manifest and Authentication Issues
-
-[X] Fix manifest.json error: remove "host_permissions" from permissions array
-[X] Add "storage" permission for chrome.storage.local API usage
-[X] Fix extension-auth endpoint to properly handle unauthenticated requests
-[X] Check if backend is running and accessible on localhost:8000
-[X] Test extension loading and functionality
-
-Manifest fixes applied:
-1. Removed "host_permissions" from permissions array (it's correctly defined as a separate top-level field)
-2. Added "storage" permission for chrome.storage.local API usage found in background script
-
-Backend fixes applied:
-1. Fixed extension-auth endpoint to properly handle requests without authentication
-2. Added proper JWT token validation and TokenPayload import
-3. Endpoint now returns meaningful error messages when no authentication is found
-
-Testing results:
-- Backend is running and accessible on localhost:8000
-- Extension-auth endpoint now returns proper JSON: `{"token":null,"status":"unauthorized","message":"No valid authentication found"}`
-- This indicates the extension will work correctly when user is not logged in
-
-## Fix GA4 Environment Variable Configuration
-
-[X] Identify hardcoded GA4 measurement IDs in frontend code
-[X] Update analytics.ts to use environment variables for measurement ID and enable flag
-[X] Remove hardcoded GA4 script from index.html
-[X] Implement dynamic GA4 script loading in analytics utility
-[X] Update main.tsx to use async analytics initialization
-[X] Fix TypeScript configuration to include .d.ts files
-[X] Update lesson about environment variable usage
-
-**Task**: Replace hardcoded GA4 measurement ID 'G-DFZYPLG7N4' with environment variables in both `frontend/index.html` and `frontend/src/utils/analytics.ts`.
-
-**Changes Made**:
-1. **analytics.ts**: Updated config to use `import.meta.env.VITE_GA4_MEASUREMENT_ID` and `import.meta.env.VITE_ENABLE_ANALYTICS`
-2. **index.html**: Removed hardcoded GA4 script tags to allow dynamic loading
-3. **analytics.ts**: Added `loadGAScript()` function for dynamic GA4 script loading with environment variable
-4. **main.tsx**: Updated to use async `initializeAnalytics()` call
-5. **tsconfig.json**: Added `.d.ts` and `.tsx` files to include array to fix TypeScript recognition
-6. **vite-env.d.ts**: Already had proper environment variable type definitions
-
-**Result**: GA4 configuration now properly uses environment variables from `.env_gcp`:
-- `VITE_GA4_MEASUREMENT_ID=G-DFZYPLG7N4` for the measurement ID
-- `VITE_ENABLE_ANALYTICS=true` for enabling/disabling analytics
-- Analytics script loads dynamically only when enabled and measurement ID is provided
-- All hardcoded values have been replaced with environment variable references
-
-## Summary 
-
-## Add Google Analytics 4 (GA4) Integration
-
-[X] Analyze project structure and current tech stack for GA4 implementation
-[X] Install required GA4 packages (@gtag/lib or react-ga4)
-[X] Add GA4 configuration to environment variables
-[X] Create GA4 utility functions for tracking page views and events
-[X] Integrate GA4 initialization in main app entry point
-[X] Add page view tracking for all routes using TanStack Router
-[X] Add custom event tracking for key user actions (mindmap creation, video analysis, etc.)
-[X] Add GA4 script tags to index.html with proper configuration
-[X] Implement privacy-compliant GA4 setup with consent management
-[ ] Test GA4 implementation in development and production environments
-[ ] Add documentation for GA4 configuration and usage
-
-**Analysis Summary:**
-This MindTube project is a React/TypeScript application using:
-- **Frontend**: Vite + React 18 + TypeScript + Chakra UI
-- **Routing**: TanStack Router (v1.19.1) 
-- **State Management**: TanStack Query
-- **Internationalization**: i18next
-- **Build Tool**: Vite
-- **Deployment**: Docker containers with nginx
-
-**Key Integration Points:**
-1. **Main App Entry**: `frontend/src/main.tsx` - Initialize GA4 after i18n setup
-2. **Root Route**: `frontend/src/routes/__root.tsx` - Add route tracking wrapper
-3. **Index HTML**: `frontend/index.html` - Add GA4 script tags
-4. **Environment**: Add `VITE_GA4_MEASUREMENT_ID` to environment variables
-5. **Key Events**: Track mindmap creation, video analysis, user registration, etc.
-
-**Implementation Strategy:**
-- Use gtag library for lightweight GA4 integration
-- Leverage TanStack Router's navigation events for page tracking
-- Create custom hooks for event tracking
-- Implement privacy-compliant setup with consent management
-- Add proper TypeScript types for GA4 functions
-
-**Privacy Considerations:**
-- Need to add cookie consent mechanism
-- Implement opt-out functionality
-- Consider GDPR compliance requirements
-- Add privacy policy updates for analytics tracking
-
-**Implementation Summary:**
-The GA4 integration has been successfully implemented with the following features:
-
-1. **Core Setup**: Added GA4 script tags to index.html with measurement ID G-DFZYPLG7N4
-2. **TypeScript Support**: Created comprehensive types for all analytics events and parameters
-3. **Analytics Utilities**: Built robust analytics.ts with functions for all event types
-4. **React Hook**: Created useAnalytics hook for easy component integration
-5. **Page Tracking**: Automatic page view tracking via root route component
-6. **Event Tracking**: Comprehensive tracking for:
-   - Authentication (login, signup, logout)
-   - Mindmap operations (create start/success/error, view, share, delete)
-   - Video analysis (request, transcript errors)
-   - Settings changes (language, theme, profile updates)
-   - Search functionality
-   - Extension usage
-
-7. **Privacy Features**: 
-   - Analytics only enabled in production
-   - IP anonymization enabled
-   - No Google signals or ad personalization
-   - Debug mode for development
-
-8. **Integration Points**:
-   - Login/Signup pages track authentication events
-   - Mindmap creation tracks full workflow with error handling
-   - Language switcher tracks language changes
-   - Theme toggles track appearance changes
-   - Dashboard navbar tracks logout events
-
-The implementation is production-ready and will automatically start tracking user interactions when deployed.
-
-## Create GitHub Repository and Push Code
-
-**Task**: Create a GitHub repository named "SaaSTemplate" using GitHub CLI and push the current codebase to it.
-
-**Steps**:
-[X] Check if GitHub CLI is installed and authenticated
-[X] Create a new GitHub repository named "SaaSTemplate"
-[X] Initialize git repository if not already done
-[X] Add all files to git
-[X] Create initial commit
-[X] Add GitHub remote origin
-[X] Push code to GitHub repository
-
-**COMPLETED SUCCESSFULLY**: 
-
-✅ **Repository Created**: https://github.com/jiahaoChen/SaaSTemplate
-- Created public repository with comprehensive description
-- Repository is accessible under the jiahaoChen GitHub account
-
-✅ **Security Issue Resolved**: 
-- GitHub push protection detected Google Cloud service account credentials in sa-key.json
-- Removed sa-key.json from git tracking and added to .gitignore
-- Used git filter-branch to completely remove the file from git history
-- Successfully pushed clean codebase without any secrets
-
-✅ **Code Successfully Pushed**:
-- All project files uploaded to GitHub repository
-- Git history cleaned of sensitive credentials
-- Repository ready for collaboration and deployment
-
-The SaaSTemplate repository is now live on GitHub and contains the complete codebase including React frontend, FastAPI backend, browser extension, and all documentation.
+## Convert Project to Generic SaaS Template
+
+**Task**: Transform this MindTube/YouTube MindMap specific application into a generic SaaS template that can be used as a foundation for other projects.
+
+**Analysis of Current Features**:
+
+### ✅ GENERIC SaaS Infrastructure (KEEP):
+1. **Authentication System**:
+   - User registration/login/logout
+   - JWT token management  
+   - Password reset functionality
+   - Email verification
+   - User profile management
+
+2. **Database Architecture**:
+   - PostgreSQL with SQLModel/SQLAlchemy
+   - Alembic migrations
+   - User model with basic fields (email, full_name, is_active, is_superuser)
+
+3. **Backend Framework**:
+   - FastAPI with proper structure
+   - API routing and middleware
+   - CORS configuration
+   - Error handling
+   - API documentation (Swagger/ReDoc)
+
+4. **Frontend Framework**:
+   - React 18 + TypeScript + Vite
+   - TanStack Router for routing
+   - TanStack Query for API state management
+   - Chakra UI for components
+
+5. **Development Infrastructure**:
+   - Docker & Docker Compose setup
+   - Environment configuration
+   - Testing structure
+   - CI/CD with deployment scripts
+
+6. **Additional Features**:
+   - Multi-language support (i18next)
+   - Dark/Light mode toggle
+   - Google Analytics integration
+   - Admin functionality
+   - User settings management
+
+### ❌ SPECIFIC Features (REMOVE):
+1. **YouTube Integration**:
+   - YouTube URL processing
+   - Video transcript extraction (yt-dlp)
+   - Video metadata fetching
+
+2. **MindMap Features**:
+   - MindMap model and all related database schemas
+   - MindMap API endpoints (/api/v1/mindmaps/*)
+   - MindMap frontend components (/components/MindMap/*)
+   - MindMap routes (/routes/_layout/mindmap/*)
+   - Markmap visualization library
+
+3. **AI/Gemini Integration**:
+   - Gemini API key fields in user model
+   - AI-powered content generation
+   - Transcript processing with AI
+
+4. **Browser Extension**:
+   - Chrome extension files
+   - Extension-specific authentication
+
+### 🤔 BORDERLINE Features (USER CHOICE):
+1. **Generic Item Model**:
+   - Current basic Item CRUD (could be useful as example)
+   - Items API endpoints
+
+2. **Email Templates**:
+   - Current email templates (password reset, etc.)
+
+3. **Landing Page**:
+   - Current landing page with MindMap-specific content
+
+4. **Deployment Configuration**:
+   - GCP-specific deployment scripts
+   - Terraform configurations
+
+**Next Steps**:
+[ ] Get user confirmation on borderline features
+[ ] Remove MindMap-specific models and migrations
+[ ] Remove MindMap API endpoints
+[ ] Remove MindMap frontend components
+[ ] Remove YouTube/AI dependencies
+[ ] Update documentation
+[ ] Clean up environment variables
+[ ] Update landing page to be generic
+[ ] Test the cleaned template
+
+**User Decisions Made**:
+1. **Item Model & API** - ✅ KEEP (useful as CRUD example)
+2. **Email Templates** - ✅ KEEP (useful for password reset, etc.)
+3. **Current Landing Page** - ✅ KEEP (will update content to be generic)
+4. **GCP Deployment Scripts** & Terraform - ✅ KEEP (useful deployment example)
+5. **Browser Extension folder** - ❌ REMOVE (completely remove)
+
+**Action Plan**:
+[X] Remove browser extension folder and files
+[X] Remove MindMap-specific models from backend/app/models.py
+[X] Remove MindMap API endpoints from backend/app/api/routes/mindmaps.py
+[X] Remove MindMap frontend components (/components/MindMap/*)
+[X] Remove MindMap routes (/routes/_layout/mindmap/*)
+[X] Remove YouTube/AI dependencies from requirements
+[X] Remove Gemini API fields from User model
+[X] Update frontend API client to remove MindMap services
+[X] Update main.py to remove MindMap router
+[X] Update landing page content to be generic
+[X] Update README.md and documentation
+[X] Clean up environment variables
+[X] Remove MindMap-related database migrations
+[ ] Update docker-compose and deployment configs
+[ ] Test the cleaned template

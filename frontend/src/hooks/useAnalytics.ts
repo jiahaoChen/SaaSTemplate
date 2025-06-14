@@ -1,67 +1,23 @@
-import { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import analytics from '../utils/analytics';
-import type { GAEventParams } from '../types/analytics';
 
 export const useAnalytics = () => {
-  // Initialize analytics on hook mount
-  useEffect(() => {
-    analytics.initialize();
-  }, []);
-
-  // Track page view manually
-  const trackPageView = useCallback((params?: GAEventParams) => {
-    analytics.trackPageView(params);
+  // Page tracking
+  const trackPageView = useCallback((page_title?: string, page_location?: string) => {
+    analytics.trackPageView(page_title, page_location);
   }, []);
 
   // Authentication tracking
-  const trackSignUp = useCallback((method: string = 'email') => {
+  const trackSignUp = useCallback((method?: string) => {
     analytics.trackSignUp(method);
   }, []);
 
-  const trackLogin = useCallback((method: string = 'email') => {
+  const trackLogin = useCallback((method?: string) => {
     analytics.trackLogin(method);
   }, []);
 
   const trackLogout = useCallback(() => {
     analytics.trackLogout();
-  }, []);
-
-  // Mindmap tracking
-  const trackMindmapCreateStart = useCallback((videoId: string, videoTitle?: string) => {
-    analytics.trackMindmapCreateStart(videoId, videoTitle);
-  }, []);
-
-  const trackMindmapCreateSuccess = useCallback((
-    videoId: string,
-    mindmapId: string,
-    processingTime?: number
-  ) => {
-    analytics.trackMindmapCreateSuccess(videoId, mindmapId, processingTime);
-  }, []);
-
-  const trackMindmapCreateError = useCallback((videoId: string, errorType: string) => {
-    analytics.trackMindmapCreateError(videoId, errorType);
-  }, []);
-
-  const trackMindmapView = useCallback((mindmapId: string, videoId?: string) => {
-    analytics.trackMindmapView(mindmapId, videoId);
-  }, []);
-
-  const trackMindmapShare = useCallback((mindmapId: string) => {
-    analytics.trackMindmapShare(mindmapId);
-  }, []);
-
-  const trackMindmapDelete = useCallback((mindmapId: string) => {
-    analytics.trackMindmapDelete(mindmapId);
-  }, []);
-
-  // Video tracking
-  const trackVideoAnalysisRequest = useCallback((videoId: string, videoTitle?: string) => {
-    analytics.trackVideoAnalysisRequest(videoId, videoTitle);
-  }, []);
-
-  const trackVideoTranscriptError = useCallback((videoId: string, errorType: string) => {
-    analytics.trackVideoTranscriptError(videoId, errorType);
   }, []);
 
   // Settings tracking
@@ -80,19 +36,6 @@ export const useAnalytics = () => {
   // Search tracking
   const trackSearch = useCallback((searchTerm: string, resultCount?: number) => {
     analytics.trackSearch(searchTerm, resultCount);
-  }, []);
-
-  // Extension tracking
-  const trackExtensionInstall = useCallback(() => {
-    analytics.trackExtensionInstall();
-  }, []);
-
-  const trackExtensionActivate = useCallback(() => {
-    analytics.trackExtensionActivate();
-  }, []);
-
-  const trackExtensionMindmapGenerate = useCallback((videoId: string) => {
-    analytics.trackExtensionMindmapGenerate(videoId);
   }, []);
 
   // Utilities
@@ -117,18 +60,6 @@ export const useAnalytics = () => {
     trackLogin,
     trackLogout,
     
-    // Mindmap
-    trackMindmapCreateStart,
-    trackMindmapCreateSuccess,
-    trackMindmapCreateError,
-    trackMindmapView,
-    trackMindmapShare,
-    trackMindmapDelete,
-    
-    // Video
-    trackVideoAnalysisRequest,
-    trackVideoTranscriptError,
-    
     // Settings
     trackLanguageChange,
     trackThemeChange,
@@ -136,11 +67,6 @@ export const useAnalytics = () => {
     
     // Search
     trackSearch,
-    
-    // Extension
-    trackExtensionInstall,
-    trackExtensionActivate,
-    trackExtensionMindmapGenerate,
     
     // Utilities
     setUserId,
