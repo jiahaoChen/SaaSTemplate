@@ -113,16 +113,8 @@ const DashboardSidebar: React.FC = () => {
   useEffect(() => {
     // Function to detect the active link from a path
     const detectActiveLink = (path: string) => {
-      if (path.includes("/mindmap/create")) {
-        return "create";
-      } else if (path.includes("/mindmap/library")) {
-        return "library";
-      } else if (path.includes("/mindmap/public-library")) {
-        return "public-library";
-      } else if (path.includes("/favorites")) {
-        return "favorites";
-      } else if (path.includes("/shared")) {
-        return "shared";
+      if (path.includes("/items")) {
+        return "items";
       } else if (path.includes("/profile")) {
         return "profile";
       } else if (path.includes("/settings")) {
@@ -205,7 +197,7 @@ const DashboardSidebar: React.FC = () => {
       >
         <Box py={5}>
           <Flex px={6} mb={6} alignItems="center" justifyContent="space-between">
-            <Text fontSize="xl" fontWeight="bold" color={textColor}>MindTube</Text>
+            <Text fontSize="xl" fontWeight="bold" color={textColor}>SaaS Template</Text>
             {isMobileMenuOpen && (
               <Flex 
                 display={{ base: "flex", md: "none" }}
@@ -217,7 +209,7 @@ const DashboardSidebar: React.FC = () => {
             )}
           </Flex>
 
-          <SidebarSection title={t('dashboard.account')}>
+          <SidebarSection title={t('dashboard.main')}>
             <SidebarLink
               to="/"
               icon={FaHome}
@@ -226,40 +218,12 @@ const DashboardSidebar: React.FC = () => {
               onClick={handleMobileMenuClick}
             />
             <SidebarLink
-              to="/mindmap/create"
+              to="/items"
               icon={FaPlusCircle}
-              label={t('dashboard.createMindmap')}
-              isActive={activeLink === "create"}
+              label={t('dashboard.items')}
+              isActive={activeLink === "items"}
               onClick={handleMobileMenuClick}
             />
-            <SidebarLink
-              to="/mindmap/library"
-              icon={FaSitemap}
-              label={t('dashboard.myMindmaps')}
-              isActive={activeLink === "library"}
-              onClick={handleMobileMenuClick}
-            />
-            <SidebarLink
-              to="/mindmap/public-library"
-              icon={FaGlobe}
-              label={t('dashboard.publicLibrary')}
-              isActive={activeLink === "public-library"}
-              onClick={handleMobileMenuClick}
-            />
-            {/* <SidebarLink
-              to="/favorites"
-              icon={FaStar}
-              label={t('dashboard.favorites')}
-              isActive={activeLink === "favorites"}
-              onClick={handleMobileMenuClick}
-            />
-            <SidebarLink
-              to="/shared"
-              icon={FaShareAlt}
-              label={t('dashboard.shared')}
-              isActive={activeLink === "shared"}
-              onClick={handleMobileMenuClick}
-            /> */}
           </SidebarSection>
           <SidebarSection title={t('dashboard.account')}>
             {/* <SidebarLink

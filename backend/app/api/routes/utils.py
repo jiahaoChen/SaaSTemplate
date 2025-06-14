@@ -33,11 +33,4 @@ async def health_check() -> bool:
     return True
 
 
-@router.get("/gemini-models", response_model=list[str])
-def get_available_gemini_models(
-    current_user: CurrentUser,  # Requires authentication
-) -> Any:
-    """
-    Retrieve the list of available Gemini models configured in the system.
-    """
-    return settings.AVAILABLE_GEMINI_MODELS
+

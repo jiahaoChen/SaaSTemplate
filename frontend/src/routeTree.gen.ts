@@ -21,6 +21,7 @@ import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSubscriptionImport } from './routes/_layout/subscription'
 import { Route as LayoutSettingsImport } from './routes/_layout/settings'
 import { Route as LayoutProfileImport } from './routes/_layout/profile'
+import { Route as LayoutItemsImport } from './routes/_layout/items'
 import { Route as LayoutHelpImport } from './routes/_layout/help'
 import { Route as LayoutFeedbackImport } from './routes/_layout/feedback'
 
@@ -76,6 +77,11 @@ const LayoutProfileRoute = LayoutProfileImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
+const LayoutItemsRoute = LayoutItemsImport.update({
+  path: '/items',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
 const LayoutHelpRoute = LayoutHelpImport.update({
   path: '/help',
   getParentRoute: () => LayoutRoute,
@@ -122,6 +128,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutHelpImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/items': {
+      preLoaderRoute: typeof LayoutItemsImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/profile': {
       preLoaderRoute: typeof LayoutProfileImport
       parentRoute: typeof LayoutImport
@@ -149,6 +159,7 @@ export const routeTree = rootRoute.addChildren([
   LayoutRoute.addChildren([
     LayoutFeedbackRoute,
     LayoutHelpRoute,
+    LayoutItemsRoute,
     LayoutProfileRoute,
     LayoutSettingsRoute,
     LayoutSubscriptionRoute,

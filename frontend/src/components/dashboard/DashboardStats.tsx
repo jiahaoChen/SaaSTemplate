@@ -3,7 +3,7 @@ import { Box, Grid, Flex, Text, Icon, Spinner, Center } from "@chakra-ui/react";
 import { FaSitemap, FaDatabase, FaChartLine, FaArrowUp, FaExclamationTriangle } from "react-icons/fa";
 import { colors, shadows } from "../../theme/tokens";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useMindmapStats } from "../../hooks/useMindmapStats";
+import { useItemStats } from "../../hooks/useItemStats";
 import useLanguage from "@/hooks/useLanguage";
 
 interface StatCardProps {
@@ -132,7 +132,7 @@ const StatCard: React.FC<StatCardProps> = ({
 };
 
 const DashboardStats: React.FC = () => {
-  const { data: stats, isLoading, error } = useMindmapStats();
+  const { data: stats, isLoading, error } = useItemStats();
   const { t } = useLanguage();
 
   if (isLoading) {
@@ -164,43 +164,43 @@ const DashboardStats: React.FC = () => {
         gap={5}
       >
         <StatCard
-          title={t("dashboard.totalMindmaps", "總思維導圖")}
-          description={t("dashboard.allCreatedMindmaps", "所有已創建的思維導圖")}
-          value={stats.totalMindmaps}
+          title={t("dashboard.totalItems", "Total Items")}
+          description={t("dashboard.allCreatedItems", "All created items")}
+          value={stats.totalItems}
           icon={FaSitemap}
           iconBg={colors.primary[50]}
           iconColor={colors.primary[500]}
           trend={{
             isUp: true,
-            value: `${t("dashboard.total", "共")} ${stats.totalMindmaps} ${t("dashboard.mindmapsUnit", "個思維導圖")}`,
+            value: `${t("dashboard.total", "Total")} ${stats.totalItems} ${t("dashboard.itemsUnit", "items")}`,
             color: colors.success,
           }}
         />
 
         <StatCard
-          title={t("dashboard.usedSpace", "已使用空間")}
-          description={t("dashboard.totalMindmapCapacity", "總可創建思維導圖數量")}
-          value={stats.totalMindmaps}
-          unit={`/${stats.maxMindmaps}`}
+          title={t("dashboard.usedSpace", "Used Space")}
+          description={t("dashboard.totalItemCapacity", "Total item capacity")}
+          value={stats.totalItems}
+          unit={`/${stats.maxItems}`}
           icon={FaDatabase}
           iconBg="rgba(246, 173, 85, 0.2)"
           iconColor={colors.warning}
           progress={{
-            value: stats.totalMindmaps,
-            max: stats.maxMindmaps,
+            value: stats.totalItems,
+            max: stats.maxItems,
             color: colors.warning,
           }}
         />
 
         <StatCard
-          title={t("dashboard.monthlyUsage", "本月使用量")}
-          description={`${t("dashboard.thisMonthGenerated", "本月已生成")} ${stats.currentMonthMindmaps} ${t("dashboard.mindmapsUnit", "個思維導圖")}`}
-          value={stats.currentMonthMindmaps}
+          title={t("dashboard.monthlyUsage", "Monthly Usage")}
+          description={`${t("dashboard.thisMonthGenerated", "Generated this month")} ${stats.currentMonthItems} ${t("dashboard.itemsUnit", "items")}`}
+          value={stats.currentMonthItems}
           icon={FaChartLine}
           iconBg="rgba(72, 187, 120, 0.2)"
           iconColor={colors.success}
           progress={{
-            value: stats.currentMonthMindmaps,
+            value: stats.currentMonthItems,
             max: 50,
             color: colors.success,
           }}

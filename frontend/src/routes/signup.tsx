@@ -124,14 +124,14 @@ function SignUp() {
               <Box mr={2}>
                 <img 
                   src="/assets/images/logo1.png" 
-                  alt="YouTube MindMap Logo"
+                  alt="SaaS Template Logo"
                   width="32"
                   height="32"
                   style={{ display: 'inline-block' }}
                 />
               </Box>
               <Heading as="h2" fontSize="1.5rem" fontWeight="700" color={textColor}>
-                YouTube MindMap
+                SaaS Template
               </Heading>
             </Flex>
           </RouterLink>

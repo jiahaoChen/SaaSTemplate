@@ -90,13 +90,13 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onMenuToggle }) => {
                 <Box mr={2} fontSize="2xl">
                   <img 
                     src="/assets/images/logo1.png" 
-                    alt="YouTube MindMap Logo"
+                    alt="SaaS Template Logo"
                     width="32"
                     height="32"
                     style={{ display: 'inline-block' }}
                   />
                 </Box>
-                <Text>YouTube MindMap</Text>
+                <Text>SaaS Template</Text>
               </Flex>
             </Link>
           </Flex>
