@@ -1,0 +1,15 @@
+FROM node:20
+
+WORKDIR /app
+
+COPY package*.json /app/
+
+RUN npm install
+
+# Skip installing browsers with deps to save disk space
+# RUN npx -y playwright install --with-deps
+RUN npx -y playwright install
+
+COPY ./ /app/
+
+ARG VITE_API_URL=${VITE_API_URL}

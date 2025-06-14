@@ -1,0 +1,116 @@
+---
+description: 
+globs: frontend/**
+alwaysApply: false
+---
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Frontend Guidelines
+
+These guidelines are tailored for a React-based ecosystem:
+check [package.json](mdc:frontend/package.json) to check what packages using PS: notice the version for compatible
+
+
+---
+
+## 1. Project Structure and Naming Conventions
+
+- **Directory/File Naming:**  
+  Use lowercase names with underscores (e.g., `components/button_group.jsx`, `pages/dashboard.jsx`) to maintain consistency.
+- **Modular Structure:**  
+  Organize your code by feature or domain (e.g., separate folders for components, hooks, contexts, and services).
+
+---
+
+## 2. Component Design and State Management
+
+- **Functional Components and Hooks:**  
+  Write your components as functional components using hooks. Avoid class components unless strictly necessary.
+- **Modularization:**  
+  Break components into small, reusable pieces. For example, separate layout components from business logic.
+- **Descriptive Naming:**  
+  Use names that reflect purpose (e.g., `useUserPermissions`, `isLoggedIn`).
+
+---
+
+## 3. Styling and Theming
+
+- **Chakra UI and Emotion:**  
+  - Use Chakra UI for pre-styled, accessible components and Emotion for custom CSS-in-JS when deeper styling customization is needed.
+  - Keep your theme consistent by leveraging Chakra’s theme configuration and Next Themes for dark/light mode support.
+- **Scoped Styles:**  
+  Prefer component-level styling to avoid global conflicts.
+
+---
+
+## 4. Data Fetching and API Integration
+
+- **@tanstack/react-query:**  
+  - Use react-query for data fetching, caching, and synchronization with the server.
+  - Configure query keys clearly and leverage the devtools (`@tanstack/react-query-devtools`) during development.
+- **Axios & Form-Data:**  
+  - Use Axios for HTTP requests, with centralized configuration (base URL, interceptors for error handling, etc.).
+  - Use form-data when handling file uploads or complex form submissions.
+
+---
+
+## 5. Routing and Navigation
+
+- **@tanstack/react-router:**  
+  - Define your routes declaratively.
+  - Organize routes in a modular fashion to separate public, private, and nested routes.
+  - Use lazy loading and code splitting for route-based components to optimize performance.
+
+---
+
+## 6. Forms and Validation
+
+- **react-hook-form:**  
+  - Leverage react-hook-form for managing form state and validation.
+  - Integrate with schema-based validation libraries (e.g., Yup) if needed.
+  - Ensure forms are accessible and provide clear user feedback on errors.
+
+---
+
+## 7. Error Handling
+
+- **react-error-boundary:**  
+  - Wrap top-level components in error boundaries to catch and log runtime errors gracefully.
+  - Provide user-friendly error messages and fallback UIs without exposing sensitive details.
+
+---
+
+## 8. Performance and Optimization
+
+- **Asynchronous Operations:**  
+  - Keep all API calls asynchronous to avoid blocking the UI.
+  - Use caching and lazy loading (supported by react-query and code splitting) to minimize unnecessary re-renders and resource fetching.
+- **Memoization and Debouncing:**  
+  - Utilize `React.memo`, `useMemo`, and `useCallback` to prevent unnecessary re-renders.
+  - Debounce user inputs when applicable, especially in search or filter functionalities.
+
+---
+
+## 9. Accessibility and UX
+
+- **UI/UX Best Practices:**  
+  - Leverage Chakra UI’s built-in accessibility features.
+  - Ensure that all interactive elements have appropriate aria attributes and that your color contrast meets accessibility standards.
+- **Responsive Design:**  
+  - Build components with responsiveness in mind, using Chakra’s responsive style props.
+
+---
+
+## 10. Code Quality and Testing
+
+- **Linting and Formatting:**  
+  - Use ESLint and Prettier to maintain a consistent code style and catch potential issues early.
+- **Unit and Integration Testing:**  
+  - Write tests for critical components using tools like Jest and React Testing Library.
+  - Test API calls and error boundaries to ensure robust behavior in edge cases.
+
+## 11. don't need to run the npm run dev
+I will run by myself, so don't need to test run

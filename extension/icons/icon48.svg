@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <!-- Main circle (root node) -->
+  <circle cx="24" cy="24" r="8" fill="#7B68EE" stroke="#6A5ACD" stroke-width="1.5" />
+  
+  <!-- Branch lines -->
+  <path d="M22 16L12 6" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M26 16L36 6" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M16 22L6 12" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M32 26L42 36" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M16 32L6 42" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M26 32L36 42" stroke="#7B68EE" stroke-width="2" stroke-linecap="round" />
+  
+  <!-- Node circles -->
+  <circle cx="12" cy="6" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+  <circle cx="36" cy="6" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+  <circle cx="6" cy="12" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+  <circle cx="42" cy="36" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+  <circle cx="6" cy="42" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+  <circle cx="36" cy="42" r="4" fill="#9E8CFF" stroke="#7B68EE" stroke-width="1.2" />
+</svg> 

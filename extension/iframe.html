@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindTube Mindmap</title>
+  <!-- Use local Material Symbols and font-awesome -->
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+  <style>
+    @font-face {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 400;
+      src: url(font-awesome/fonts/roboto-400.woff2) format('woff2');
+    }
+    
+    @font-face {
+      font-family: 'Roboto';
+      font-style: normal;
+      font-weight: 500;
+      src: url(font-awesome/fonts/roboto-500.woff2) format('woff2');
+    }
+    
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: transparent !important; /* Make body transparent */
+    }
+    
+    #container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #mindmap-container {
+      flex: 1;
+      position: relative;
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 9999;
+      display: flex;
+      gap: 8px;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 8px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    #transparency-control {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      width: 200px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    
+    .transparency-slider {
+      flex: 1;
+      height: 4px;
+      background-color: #e2e8f0;
+      border-radius: 4px;
+      position: relative;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+    
+    .transparency-slider-fill {
+      height: 100%;
+      background-color: #7B68EE;
+      border-radius: 4px;
+      width: 50%;
+    }
+    
+    .transparency-slider-thumb {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      cursor: grab;
+    }
+    
+    .transparency-slider-thumb:active {
+      cursor: grabbing;
+    }
+    
+    .transparency-label {
+      font-size: 12px;
+      color: #4a5568;
+      white-space: nowrap;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 4px;
+    }
+    
+    button {
+      background-color: white;
+      color: #4a5568;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      padding: 0;
+      position: relative;
+      margin: 0 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    button:hover {
+      background-color: #f5f5f5;
+    }
+    
+    button.active {
+      background-color: #7B68EE;
+      color: white;
+    }
+    
+    button .fa {
+      font-size: 16px;
+    }
+    
+    /* Switch icons when button is toggled */
+    #toggle-fold.active .fa-folder {
+      display: none;
+    }
+    
+    #toggle-fold.active::before {
+      content: "\f07c"; /* fa-folder-open */
+      font-family: FontAwesome;
+      font-size: 16px;
+    }
+    
+    #toggle-fullscreen.active .fa-expand {
+      display: none;
+    }
+    
+    #toggle-fullscreen.active::before {
+      content: "\f066"; /* fa-compress */
+      font-family: FontAwesome;
+      font-size: 16px;
+    }
+    
+    /* Video control button states */
+    #video-play.active {
+      display: none;
+    }
+    
+    #video-pause.active {
+      display: none;
+    }
+    
+    /* Hide play button when video is playing (pause is shown) */
+    #video-play.hidden {
+      display: none;
+    }
+    
+    /* Hide pause button when video is paused (play is shown) */
+    #video-pause.hidden {
+      display: none;
+    }
+    
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      z-index: 20;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(123, 104, 238, 0.3);
+      border-radius: 50%;
+      border-top-color: #7B68EE;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 16px;
+    }
+    
+    .loading-text {
+      color: #333;
+      font-size: 18px;
+    }
+    
+    .error {
+      color: #e53e3e;
+      text-align: center;
+      max-width: 80%;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+      body {
+        /* background-color: #1a202c; Ensure body remains transparent in dark mode too */
+        color: #e2e8f0;
+      }
+      
+      #mindmap-container {
+        background-color: rgba(26, 32, 44, 0.9);
+      }
+      
+      #controls, #transparency-control {
+        background-color: rgba(45, 55, 72, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      button {
+        color: #a0aec0;
+        border-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(45, 55, 72, 0.5);
+      }
+      
+      button:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      
+      button.active {
+        background-color: #7B68EE;
+        color: white;
+      }
+      
+      .transparency-label {
+        color: #a0aec0;
+      }
+      
+      .transparency-slider {
+        background-color: #2d3748;
+      }
+      
+      .loading {
+        background-color: rgba(26, 32, 44, 0.9);
+      }
+      
+      .loading-text {
+        color: #e2e8f0;
+      }
+      
+      .transparency-slider-thumb {
+        background-color: #a0aec0;
+      }
+    }
+    
+    /* Markmap custom styles */
+    .markmap-node text {
+      fill: #1a202c !important;
+      font-weight: 500 !important;
+      stroke: none !important;
+    }
+    
+    .markmap-node div {
+      color: #1a202c !important;
+      font-weight: 500 !important;
+    }
+    
+    .markmap-node foreignObject div {
+      color: #1a202c !important;
+      font-weight: 500 !important;
+    }
+    
+    .markmap-node > g > circle {
+      stroke: #4a5568 !important;
+    }
+    
+    .markmap-link {
+      stroke: #718096 !important;
+    }
+    
+    /* Dark mode markmap styles */
+    @media (prefers-color-scheme: dark) {
+      .markmap-node text {
+        fill: #ffffff !important;
+        font-weight: 500 !important;
+        stroke: none !important;
+      }
+      
+      .markmap-node div {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+      }
+      
+      .markmap-node foreignObject div {
+        color: #ffffff !important;
+        font-weight: 500 !important;
+      }
+      
+      .markmap-node > g > circle {
+        stroke: #a0aec0 !important;
+      }
+      
+      .markmap-link {
+        stroke: #a0aec0 !important;
+      }
+    }
+    
+    /* Ensure the markmap is below controls */
+    svg#markmap {
+      position: relative;
+      z-index: 5;
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .tooltip {
+        background-color: rgba(45, 55, 72, 0.9);
+        color: #e2e8f0;
+      }
+    }
+    
+    button:hover .tooltip,
+    #transparency-control:hover .tooltip {
+      opacity: 1;
+    }
+  </style>
+  
+  <!-- Load D3 as a regular script -->
+  <script src="js/d3.min.js"></script>
+  
+  <!-- Load markmap dependencies as UMD scripts -->
+  <script src="js/lib/markmap-common.js"></script>
+  <script src="js/lib/markmap-lib.js"></script>
+  <script src="js/lib/markmap-view.js"></script>
+  
+</head>
+<body>
+  <div id="container">
+    <div id="mindmap-container">
+      <div id="controls">
+        <div class="button-group">
+          <button id="video-play" title="播放">
+            <i class="fa fa-play"></i>
+          </button>
+          <button id="video-pause" title="暫停" class="hidden">
+            <i class="fa fa-pause"></i>
+          </button>
+          <button id="zoom-in" title="放大">
+            <i class="fa fa-plus"></i>
+          </button>
+          <button id="zoom-out" title="縮小">
+            <i class="fa fa-minus"></i>
+          </button>
+          <button id="reset-view" title="重置視圖">
+            <i class="fa fa-bullseye"></i>
+          </button>
+          <button id="toggle-fold" title="摺疊/展開">
+            <i class="fa fa-folder"></i>
+          </button>
+          <button id="toggle-fullscreen" title="全屏">
+            <i class="fa fa-expand"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div id="transparency-control">
+        <span class="transparency-label">透明</span>
+        <div class="transparency-slider" id="transparency-slider">
+          <div class="transparency-slider-fill" id="transparency-slider-fill"></div>
+          <div class="transparency-slider-thumb" id="transparency-slider-thumb"></div>
+        </div>
+        <span class="transparency-label">不透明</span>
+      </div>
+      
+      <svg id="markmap"></svg>
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading mindmap...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load the iframe script as regular script -->
+  <script src="dist/iframe.bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindTube 登入</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      background-color: #f9f9f9;
+    }
+    
+    h1 {
+      font-size: 18px;
+      color: #333;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    h1 .material-symbols-rounded {
+      margin-right: 8px;
+      color: #7B68EE;
+    }
+    
+    .login-form {
+      display: none; /* Initially hidden until login state is determined */
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #555;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      background-color: #7B68EE;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 500;
+    }
+    
+    button:hover {
+      background-color: #6A5ACD;
+    }
+    
+    .user-info {
+      display: none; /* Initially hidden until login state is determined */
+    }
+    
+    .user-info p {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+    }
+    
+    .user-email {
+      font-weight: bold;
+    }
+    
+    .status-message {
+      font-size: 14px;
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+      transition: opacity 0.3s ease;
+    }
+    
+    .success {
+      background-color: #e6f7e6;
+      color: #2c662d;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .loading {
+      background-color: #e2e3e5;
+      color: #495057;
+      border: 1px solid #d6d8db;
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #7B68EE;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1><span class="material-symbols-rounded"></span><a id="mindtube-link" href="#" target="_blank">MindTube</a> 登入</h1>
+  
+  <div id="status-container"></div>
+  
+  <div id="login-form" class="login-form">
+    <div class="form-group">
+      <label for="email">電子郵件:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="password">密碼:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    
+    <button id="login-button" type="button">登入</button>
+  </div>
+  
+  <div id="user-info" class="user-info">
+    <p>已登入為 <span id="user-email" class="user-email"></span></p>
+    <button id="logout-button" type="button">登出</button>
+  </div>
+  
+  <script src="dist/popup.bundle.js"></script>
+</body>
+</html> 

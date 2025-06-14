@@ -1,0 +1,12 @@
+.vscode
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/extension/dist/**
+/extension/release/**
+.DS_Store
+.specstory/history/**
+**/.DS_Store
+.specstory/**

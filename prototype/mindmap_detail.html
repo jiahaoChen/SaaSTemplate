@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube MindMap - 思維導圖詳情</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #7856ff;
+            --primary-dark: #6040e0;
+            --primary-light: #e6e0ff;
+            --secondary: #ff6c87;
+            --success: #48bb78;
+            --warning: #f6ad55;
+            --danger: #f56565;
+            --dark: #333333;
+            --light: #f5f7fa;
+            --gray: #e2e8f0;
+            --gray-dark: #718096;
+            --border-radius: 10px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            color: var(--dark);
+            background-color: #f8fafc;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e05a73;
+        }
+        
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-ghost:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #e74c3c;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray);
+            font-family: 'Noto Sans TC', sans-serif;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(120, 86, 255, 0.2);
+        }
+        
+        /* 頂部導航 */
+        .top-navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .logo i {
+            color: var(--primary);
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        
+        /* 主要樣式 */
+        .content-wrapper {
+            flex: 1;
+            padding: 40px 0;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .page-subtitle {
+            color: var(--gray-dark);
+            font-size: 1.1rem;
+        }
+        
+        /* 詳情頁樣式 */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        
+        .detail-title-section {
+            flex: 1;
+        }
+        
+        .detail-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 15px;
+            color: var(--gray-dark);
+            font-size: 0.9rem;
+        }
+        
+        .detail-meta-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-meta-item i {
+            margin-right: 8px;
+        }
+        
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .tag {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .tab-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            margin-right: 20px;
+        }
+        
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .mindmap-container {
+            height: 600px;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .mindmap-toolbar {
+            background-color: white;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-dark);
+            transition: var(--transition);
+            background-color: transparent;
+        }
+        
+        .toolbar-btn:hover {
+            background-color: var(--light);
+            color: var(--primary);
+        }
+        
+        .toolbar-btn.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .zoom-level {
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+        }
+        
+        .mindmap-view {
+            height: calc(100% - 57px);
+            overflow: auto;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+        }
+        
+        .info-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .video-info {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .video-thumbnail {
+            width: 200px;
+            height: 112px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-details {
+            flex: 1;
+        }
+        
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .video-channel {
+            color: var(--gray-dark);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .video-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--gray-dark);
+        }
+        
+        .video-stats i {
+            margin-right: 5px;
+        }
+        
+        .summary-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .summary-paragraph {
+            margin-bottom: 15px;
+        }
+        
+        .summary-paragraph:last-child {
+            margin-bottom: 0;
+        }
+        
+        .key-points {
+            margin-top: 20px;
+        }
+        
+        .key-point-item {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        
+        .key-point-item i {
+            color: var(--primary);
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 頂部導航欄 -->
+    <nav class="top-navbar">
+        <div class="container navbar-container">
+            <a href="prototype_feature.html" class="logo">
+                <i class="fas fa-sitemap"></i>
+                YouTube MindMap
+            </a>
+            
+            <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; margin-right: 20px;">
+                    <div class="user-avatar">W</div>
+                    <span>王大明</span>
+                </div>
+                <a href="user_profile.html" class="btn btn-ghost">
+                    <i class="fas fa-user-cog" style="margin-right: 5px;"></i>
+                    個人設置
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主要內容 -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- 返回按鈕 -->
+            <div style="margin-bottom: 20px;">
+                <a href="mindmap_library.html" class="btn btn-ghost" style="padding: 8px 16px;">
+                    <i class="fas fa-arrow-left" style="margin-right: 5px;"></i>
+                    返回思維導圖庫
+                </a>
+            </div>
+            
+            <!-- 詳情頁頭部 -->
+            <div class="detail-header">
+                <div class="detail-title-section">
+                    <h1 class="page-title">AI 發展趨勢與未來前景分析</h1>
+                    
+                    <div class="detail-meta">
+                        <div class="detail-meta-item">
+                            <i class="far fa-calendar-alt"></i>
+                            <span>創建於 2023-10-18</span>
+                        </div>
+                        <div class="detail-meta-item">
+                            <i class="far fa-clock"></i>
+                            <span>上次編輯 2023-10-19</span>
+                        </div>
+                        <div class="detail-meta-item">
+                            <i class="far fa-chart-bar"></i>
+                            <span>38 個節點</span>
+                        </div>
+                        <div class="detail-meta-item">
+                            <i class="far fa-eye"></i>
+                            <span>24 次查看</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-tags">
+                        <span class="tag">人工智能</span>
+                        <span class="tag">科技趨勢</span>
+                        <span class="tag">未來展望</span>
+                        <span class="tag">TED演講</span>
+                        <button class="btn" style="padding: 4px 10px; font-size: 0.75rem; background: transparent; border: 1px dashed var(--gray); color: var(--gray-dark);">
+                            <i class="fas fa-plus" style="margin-right: 3px;"></i>
+                            添加標籤
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="detail-actions">
+                    <button class="btn btn-ghost">
+                        <i class="fas fa-heart" style="margin-right: 5px; color: var(--secondary);"></i>
+                        收藏
+                    </button>
+                    <button class="btn btn-ghost">
+                        <i class="fas fa-share-alt" style="margin-right: 5px;"></i>
+                        分享
+                    </button>
+                    <button class="btn btn-ghost">
+                        <i class="fas fa-download" style="margin-right: 5px;"></i>
+                        導出
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit" style="margin-right: 5px;"></i>
+                        編輯
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 標籤頁 -->
+            <div class="tabs">
+                <div class="tab-item active" data-tab="mindmap">思維導圖</div>
+                <div class="tab-item" data-tab="summary">文字摘要</div>
+                <div class="tab-item" data-tab="video">原始影片</div>
+                <div class="tab-item" data-tab="settings">設置</div>
+            </div>
+            
+            <!-- 思維導圖標籤頁內容 -->
+            <div class="tab-content active" id="mindmap-tab">
+                <div class="mindmap-container">
+                    <div class="mindmap-toolbar">
+                        <div class="toolbar-group">
+                            <div class="toolbar-btn active" title="移動工具">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <div class="toolbar-btn" title="選擇工具">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div class="toolbar-btn" title="添加節點">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="toolbar-btn" title="刪除節點">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                            <div class="toolbar-btn" title="連接節點">
+                                <i class="fas fa-link"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="zoom-controls">
+                            <div class="toolbar-btn" title="縮小">
+                                <i class="fas fa-search-minus"></i>
+                            </div>
+                            <span class="zoom-level">100%</span>
+                            <div class="toolbar-btn" title="放大">
+                                <i class="fas fa-search-plus"></i>
+                            </div>
+                            <div class="toolbar-btn" title="適應畫面">
+                                <i class="fas fa-expand"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mindmap-view">
+                        <!-- 思維導圖預覽圖 (實際實現會使用 markmap 庫渲染) -->
+                        <img src="https://placehold.co/1200x800/e6e0ff/333333/png?text=AI+Development+Mindmap" alt="思維導圖預覽" style="max-width: 100%; max-height: 100%;">
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3 class="info-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        影片資訊
+                    </h3>
+                    
+                    <div class="video-info">
+                        <div class="video-thumbnail">
+                            <img src="https://placehold.co/400x225/e6e0ff/333333/png?text=AI+TED+Talk" alt="影片縮圖">
+                        </div>
+                        
+                        <div class="video-details">
+                            <div class="video-title">人工智能的未來：機遇與挑戰 | TED演講</div>
+                            <div class="video-channel">TED 官方頻道</div>
+                            <div class="video-stats">
+                                <span><i class="far fa-eye"></i> 2.4M 次觀看</span>
+                                <span><i class="far fa-calendar-alt"></i> 2023年8月15日</span>
+                                <span><i class="far fa-clock"></i> 18:24</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 文字摘要標籤頁內容 -->
+            <div class="tab-content" id="summary-tab">
+                <div class="summary-content">
+                    <div class="summary-paragraph">
+                        本演講探討了人工智能的最新發展趨勢及其對未來社會的潛在影響。演講者首先回顧了AI技術的發展歷程，從早期的專家系統到現代的深度學習和大型語言模型，強調了技術進步的加速性質。
+                    </div>
+                    
+                    <div class="summary-paragraph">
+                        演講的核心部分集中在AI的四個主要發展方向：通用人工智能(AGI)的進展、多模態模型的興起、AI在特定領域的專業化應用，以及AI系統的可解釋性和透明度。演講者指出，雖然AGI的實現仍面臨諸多挑戰，但近年來大型語言模型的突破已經展示了AI在理解和生成人類語言方面的顯著能力。
+                    </div>
+                    
+                    <div class="summary-paragraph">
+                        關於多模態模型，演講者強調了結合視覺、語言和聲音等多種輸入的AI系統將極大地擴展應用範圍，從醫療診斷到自動駕駛。在專業化應用方面，AI已經在某些特定領域達到或超越人類專家水平，例如蛋白質折疊預測和藥物發現。
+                    </div>
+                    
+                    <div class="summary-paragraph">
+                        演講的最後部分討論了AI發展面臨的社會和倫理挑戰，包括就業市場變革、隱私問題、算法偏見以及安全風險。演講者呼籲建立全球性的AI治理框架，確保技術發展與人類價值觀保持一致。
+                    </div>
+                    
+                    <div class="key-points">
+                        <h4 style="margin-bottom: 15px; font-weight: 600;">關鍵要點：</h4>
+                        
+                        <div class="key-point-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>AI技術正經歷前所未有的快速發展，大型語言模型展現出接近人類的語言理解能力</div>
+                        </div>
+                        
+                        <div class="key-point-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>多模態AI系統將成為下一代AI發展的重要方向，結合視覺、語言等多種輸入</div>
+                        </div>
+                        
+                        <div class="key-point-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>AI在醫療、科學研究等專業領域的應用將帶來革命性突破</div>
+                        </div>
+                        
+                        <div class="key-point-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>AI系統的可解釋性和透明度是建立信任的關鍵，需要更多研究投入</div>
+                        </div>
+                        
+                        <div class="key-point-item">
+                            <i class="fas fa-check-circle"></i>
+                            <div>社會需要積極應對AI帶來的就業變革、隱私和安全挑戰</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 原始影片標籤頁內容 -->
+            <div class="tab-content" id="video-tab">
+                <div class="card" style="margin-bottom: 30px;">
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+                        <!-- 這裡使用占位圖，實際應用中會嵌入YouTube影片 -->
+                        <img src="https://placehold.co/1280x720/e6e0ff/333333/png?text=YouTube+Video+Player" alt="影片播放器" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <i class="far fa-play-circle" style="font-size: 4rem; color: white; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 20px; margin-bottom: 30px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;">影片資訊</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="font-weight: 600; margin-bottom: 5px;">人工智能的未來：機遇與挑戰 | TED演講</h4>
+                        <p style="color: var(--gray-dark); font-size: 0.9rem;">發布於 2023年8月15日 | 18:24</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary-light); display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                                <i class="fab fa-youtube" style="color: var(--primary);"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 500;">TED 官方頻道</div>
+                                <div style="font-size: 0.85rem; color: var(--gray-dark);">2.4M 訂閱者</div>
+                            </div>
+                            <button class="btn btn-ghost" style="margin-left: auto; padding: 6px 12px; font-size: 0.85rem;">
+                                <i class="fas fa-external-link-alt" style="margin-right: 5px;"></i>
+                                前往YouTube
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="font-weight: 600; margin-bottom: 10px;">影片描述</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            在這場TED演講中，AI研究專家探討了人工智能的最新發展趨勢及其對未來社會的潛在影響。演講涵蓋了從技術進步到社會影響的廣泛話題，包括通用人工智能的進展、多模態模型的興起、AI在特定領域的專業化應用，以及AI系統的可解釋性和透明度。同時也討論了AI發展面臨的社會和倫理挑戰，包括就業市場變革、隱私問題、算法偏見以及安全風險。
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 10px;">標籤</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="tag">TED</span>
+                            <span class="tag">人工智能</span>
+                            <span class="tag">科技</span>
+                            <span class="tag">未來</span>
+                            <span class="tag">機器學習</span>
+                            <span class="tag">深度學習</span>
+                            <span class="tag">AGI</span>
+                            <span class="tag">科技倫理</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 20px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center;">
+                        <i class="fas fa-comments" style="margin-right: 10px; color: var(--primary);"></i>
+                        評論 (124)
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--light); display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-user" style="color: var(--gray-dark);"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <div style="font-weight: 500;">林小明</div>
+                                    <div style="font-size: 0.85rem; color: var(--gray-dark);">2天前</div>
+                                </div>
+                                <p style="font-size: 0.95rem; line-height: 1.6;">
+                                    這是我看過關於AI未來發展最全面的演講之一，特別是關於多模態模型的部分非常有啟發性。演講者對技術和社會影響的平衡討論也很到位。
+                                </p>
+                                <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85rem; color: var(--gray-dark);">
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-thumbs-up" style="margin-right: 5px;"></i>
+                                        <span>42</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-thumbs-down" style="margin-right: 5px;"></i>
+                                        <span>2</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-comment" style="margin-right: 5px;"></i>
+                                        <span>回覆</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--light); display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0;">
+                                <i class="fas fa-user" style="color: var(--gray-dark);"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <div style="font-weight: 500;">陳大文</div>
+                                    <div style="font-size: 0.85rem; color: var(--gray-dark);">1週前</div>
+                                </div>
+                                <p style="font-size: 0.95rem; line-height: 1.6;">
+                                    我認為演講者對AGI的時間線預測過於樂觀，但關於AI在專業領域應用的分析非常準確。作為一名醫療行業從業者，我已經看到AI在診斷輔助方面的巨大潛力。
+                                </p>
+                                <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85rem; color: var(--gray-dark);">
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-thumbs-up" style="margin-right: 5px;"></i>
+                                        <span>28</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-thumbs-down" style="margin-right: 5px;"></i>
+                                        <span>5</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; cursor: pointer;">
+                                        <i class="far fa-comment" style="margin-right: 5px;"></i>
+                                        <span>回覆</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-ghost" style="width: 100%;">
+                        查看更多評論
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 設置標籤頁內容 -->
+            <div class="tab-content" id="settings-tab">
+                <div class="card" style="padding: 20px; margin-bottom: 30px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">思維導圖設置</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">思維導圖標題</label>
+                        <input type="text" value="AI 發展趨勢與未來前景分析" placeholder="輸入思維導圖標題">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">標籤</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                            <span class="tag" style="display: flex; align-items: center;">
+                                人工智能
+                                <i class="fas fa-times" style="margin-left: 5px; font-size: 0.7rem; cursor: pointer;"></i>
+                            </span>
+                            <span class="tag" style="display: flex; align-items: center;">
+                                科技趨勢
+                                <i class="fas fa-times" style="margin-left: 5px; font-size: 0.7rem; cursor: pointer;"></i>
+                            </span>
+                            <span class="tag" style="display: flex; align-items: center;">
+                                未來展望
+                                <i class="fas fa-times" style="margin-left: 5px; font-size: 0.7rem; cursor: pointer;"></i>
+                            </span>
+                            <span class="tag" style="display: flex; align-items: center;">
+                                TED演講
+                                <i class="fas fa-times" style="margin-left: 5px; font-size: 0.7rem; cursor: pointer;"></i>
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" placeholder="添加新標籤" style="flex: 1;">
+                            <button class="btn btn-primary" style="padding: 12px 20px;">添加</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">思維導圖樣式</label>
+                        <select>
+                            <option value="radial">放射狀</option>
+                            <option value="tree">樹狀結構</option>
+                            <option value="mindmap">標準思維導圖</option>
+                            <option value="org">組織結構圖</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">顏色主題</label>
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: var(--primary); cursor: pointer; border: 2px solid white; box-shadow: 0 0 0 2px var(--primary);"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #3498db; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #2ecc71; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #e74c3c; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #f39c12; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #9b59b6; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #1abc9c; cursor: pointer;"></div>
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background-color: #34495e; cursor: pointer;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">字體大小</label>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="range" min="12" max="24" value="16" style="flex: 1;">
+                            <span style="font-size: 0.9rem; color: var(--gray-dark);">16px</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">連接線樣式</label>
+                        <select>
+                            <option value="curved">曲線</option>
+                            <option value="straight">直線</option>
+                            <option value="orthogonal">正交線</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" checked style="width: auto;">
+                            <span>顯示節點編號</span>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" checked style="width: auto;">
+                            <span>自動保存更改</span>
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button class="btn btn-ghost">取消</button>
+                        <button class="btn btn-primary">保存設置</button>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 20px; margin-bottom: 30px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center;">
+                        <i class="fas fa-share-alt" style="margin-right: 10px; color: var(--primary);"></i>
+                        分享設置
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">訪問權限</label>
+                        <select>
+                            <option value="private">僅自己可見</option>
+                            <option value="link">擁有連結的人可以查看</option>
+                            <option value="public">公開（所有人可見）</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">分享連結</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" value="https://youtu.be-mindmap.com/share/ai-trends-2023" readonly style="flex: 1; background-color: var(--light);">
+                            <button class="btn btn-primary" style="padding: 12px 20px;">
+                                <i class="far fa-copy" style="margin-right: 5px;"></i>
+                                複製
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">社交媒體分享</label>
+                        <div style="display: flex; gap: 15px;">
+                            <button class="btn" style="background-color: #1877f2; color: white;">
+                                <i class="fab fa-facebook-f" style="margin-right: 5px;"></i>
+                                Facebook
+                            </button>
+                            <button class="btn" style="background-color: #1da1f2; color: white;">
+                                <i class="fab fa-twitter" style="margin-right: 5px;"></i>
+                                Twitter
+                            </button>
+                            <button class="btn" style="background-color: #0a66c2; color: white;">
+                                <i class="fab fa-linkedin-in" style="margin-right: 5px;"></i>
+                                LinkedIn
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" style="width: auto;">
+                            <span>允許他人複製此思維導圖</span>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" style="width: auto;">
+                            <span>允許他人下載此思維導圖</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 20px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: var(--danger); display: flex; align-items: center;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                        危險區域
+                    </h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-ghost" style="color: var(--danger); border-color: var(--danger);">
+                            <i class="fas fa-archive" style="margin-right: 5px;"></i>
+                            歸檔思維導圖
+                        </button>
+                        <p style="font-size: 0.85rem; color: var(--gray-dark); margin-top: 8px;">
+                            歸檔後，思維導圖將被移至歸檔區，但不會被刪除。
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <button class="btn btn-danger">
+                            <i class="fas fa-trash-alt" style="margin-right: 5px;"></i>
+                            刪除思維導圖
+                        </button>
+                        <p style="font-size: 0.85rem; color: var(--gray-dark); margin-top: 8px;">
+                            此操作不可逆，刪除後將無法恢復。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // 標籤頁切換功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabItems = document.querySelectorAll('.tab-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 移除所有標籤頁的活動狀態
+                    tabItems.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // 設置當前標籤頁為活動狀態
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                });
+            });
+            
+            // 工具欄按鈕點擊事件
+            const toolbarBtns = document.querySelectorAll('.toolbar-btn');
+            toolbarBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 如果是移動工具或縮放工具，不需要互斥
+                    if (!this.title.includes('移動') && !this.title.includes('縮小') && 
+                        !this.title.includes('放大') && !this.title.includes('適應')) {
+                        toolbarBtns.forEach(b => {
+                            if (!b.title.includes('移動') && !b.title.includes('縮小') && 
+                                !b.title.includes('放大') && !b.title.includes('適應')) {
+                                b.classList.remove('active');
+                            }
+                        });
+                    }
+                    this.classList.toggle('active');
+                });
+            });
+            
+            // 收藏按鈕點擊事件
+            const favoriteBtn = document.querySelector('.detail-actions .btn:first-child');
+            favoriteBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.innerHTML = '<i class="fas fa-heart" style="margin-right: 5px; color: var(--secondary);"></i> 已收藏';
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.innerHTML = '<i class="far fa-heart" style="margin-right: 5px; color: var(--secondary);"></i> 收藏';
+                }
+            });
+            
+            // 模擬複製連結功能
+            const copyLinkBtn = document.querySelector('#settings-tab .btn-primary:nth-of-type(1)');
+            if (copyLinkBtn) {
+                copyLinkBtn.addEventListener('click', function() {
+                    this.innerHTML = '<i class="fas fa-check" style="margin-right: 5px;"></i> 已複製';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="far fa-copy" style="margin-right: 5px;"></i> 複製';
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

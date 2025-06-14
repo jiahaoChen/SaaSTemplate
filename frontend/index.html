@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube MindMap</title>
+    <link rel="icon" type="image/png" href="/assets/images/logo2_128x128.png" />
+    <!-- Google Analytics will be initialized dynamically by the app -->
+    
+    <script>
+      // Detect user language preference
+      (function() {
+        var userLang = navigator.language || navigator.userLanguage;
+        var storedLang = localStorage.getItem('i18nextLng');
+        var validLangs = ['en', 'zh'];
+        
+        // Clean up any malformed language codes
+        if (storedLang && validLangs.indexOf(storedLang) === -1) {
+          // If stored language is not valid, remove it
+          localStorage.removeItem('i18nextLng');
+          storedLang = null;
+        }
+        
+        // Set lang attribute based on stored preference or browser language
+        if (storedLang && validLangs.indexOf(storedLang) !== -1) {
+          document.documentElement.lang = storedLang;
+        } else if (userLang.startsWith('zh')) {
+          document.documentElement.lang = 'zh';
+          localStorage.setItem('i18nextLng', 'zh');
+        } else {
+          document.documentElement.lang = 'en';
+          localStorage.setItem('i18nextLng', 'en');
+        }
+        
+        // Add data attribute for easier debugging
+        document.documentElement.setAttribute('data-lang', document.documentElement.lang);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

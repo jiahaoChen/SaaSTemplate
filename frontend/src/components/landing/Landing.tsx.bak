@@ -1,0 +1,389 @@
+import React from "react";
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Image,
+  Text,
+  VStack,
+  HStack,
+  Icon,
+  Grid,
+  Stack,
+  IconButton,
+} from "@chakra-ui/react";
+import { Link } from "@tanstack/react-router";
+import { FaPlay, FaUserPlus, FaCheckCircle, FaArrowRight } from "react-icons/fa";
+import { ColorModeButton, useColorModeValue } from "../ui/color-mode";
+
+export function Landing() {
+  // Color mode values
+  const bgColor = useColorModeValue("white", "#121212");
+  const textColor = useColorModeValue("#333333", "#f5f7fa");
+  const secondaryTextColor = useColorModeValue("#718096", "#a0aec0");
+  const cardBg = useColorModeValue("white", "#1e1e1e");
+  const brandsSectionBg = useColorModeValue("#f5f7fa", "#1a202c");
+  const primaryColor = useColorModeValue("#7856ff", "#8a70ff");
+  const borderColor = useColorModeValue("#e2e8f0", "#2d3748");
+
+  return (
+    <Box bg={bgColor} color={textColor} minH="100vh" transition="all 0.3s ease">
+      {/* Navigation Bar */}
+      <Box as="nav" bg={cardBg} boxShadow="0 2px 10px rgba(0,0,0,0.05)" position="sticky" top={0} zIndex={1000}>
+        <Container maxW="1200px" py={4}>
+          <Flex justify="space-between" align="center">
+            <Flex align="center">
+              <Icon viewBox="0 0 24 24" boxSize={8} color={primaryColor} mr={2}>
+                <path
+                  fill="currentColor"
+                  d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z"
+                />
+              </Icon>
+              <Heading as="h1" size="lg" fontWeight="bold">
+                MindTube
+              </Heading>
+            </Flex>
+
+            <HStack gap={8} display={{ base: "none", md: "flex" }}>
+              <Link to="/features" activeOptions={{ exact: true }}>
+                <Text fontWeight="medium">特色功能</Text>
+              </Link>
+              <Link to="/pricing" activeOptions={{ exact: true }}>
+                <Text fontWeight="medium">方案價格</Text>
+              </Link>
+              <Link to="/testimonials" activeOptions={{ exact: true }}>
+                <Text fontWeight="medium">用戶評價</Text>
+              </Link>
+              <Link to="/faq" activeOptions={{ exact: true }}>
+                <Text fontWeight="medium">常見問題</Text>
+              </Link>
+            </HStack>
+
+            <HStack gap={4}>
+              <Link to="/login" activeOptions={{ exact: true }}>
+                <Button variant="outline" colorScheme="purple">
+                  登入
+                </Button>
+              </Link>
+              <Link to="/signup" activeOptions={{ exact: true }}>
+                <Button colorScheme="purple">免費註冊</Button>
+              </Link>
+              <ColorModeButton />
+            </HStack>
+
+            <IconButton
+              display={{ base: "flex", md: "none" }}
+              aria-label="Open menu"
+              fontSize="20px"
+              variant="ghost"
+            >
+              <Icon as={FaArrowRight} />
+            </IconButton>
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* Hero Section */}
+      <Box as="section" pt={16} pb={0}>
+        <Container maxW="1200px">
+          <Flex
+            direction={{ base: "column", lg: "row" }}
+            align="center"
+            justify="space-between"
+            gap={8}
+          >
+            <VStack align="flex-start" gap={6} maxW={{ lg: "600px" }}>
+              <Heading
+                as="h2"
+                fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
+                lineHeight="1.2"
+                fontWeight="bold"
+              >
+                將 YouTube 影片
+                <br />
+                <Text as="span" color={primaryColor}>
+                  智能轉化
+                </Text>
+                為思維導圖
+              </Heading>
+              
+              <Text fontSize={{ base: "lg", md: "xl" }} color={secondaryTextColor}>
+                只需貼上 YouTube 鏈結，我們的 AI 助手將自動摘取關鍵內容，生成結構化思維導圖，幫助你快速理解和整理影片知識。
+              </Text>
+              
+              <HStack gap={4} flexWrap="wrap">
+                <Link to="/mindmap/create" activeOptions={{ exact: true }}>
+                  <Button
+                    size="lg"
+                    colorScheme="purple"
+                  >
+                    <Flex align="center" gap={2}>
+                      <Icon as={FaPlay} />
+                      <span>立即體驗</span>
+                    </Flex>
+                  </Button>
+                </Link>
+                
+                <Link to="/signup" activeOptions={{ exact: true }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    colorScheme="purple"
+                  >
+                    <Flex align="center" gap={2}>
+                      <Icon as={FaUserPlus} />
+                      <span>免費註冊</span>
+                    </Flex>
+                  </Button>
+                </Link>
+              </HStack>
+              
+              <HStack color={secondaryTextColor}>
+                <Icon as={FaCheckCircle} color="green.500" />
+                <Text>無需信用卡，註冊即可免費使用基本功能</Text>
+              </HStack>
+            </VStack>
+            
+            <Box>
+              <Image
+                src="/images/mindmap-hero.png"
+                alt="MindTube 示例"
+                borderRadius="lg"
+                boxShadow="lg"
+                maxW={{ base: "100%", lg: "500px" }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://placehold.co/600x400/7856ff/FFFFFF/png?text=MindTube";
+                }}
+              />
+            </Box>
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* Brands Section */}
+      <Box as="section" bg={brandsSectionBg} py={8} mt={16}>
+        <Container maxW="1200px">
+          <Text textAlign="center" mb={6} color={secondaryTextColor}>
+            受到眾多知名機構信賴
+          </Text>
+          
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap={8}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Image
+                key={i}
+                src={`https://placehold.co/120x40/${borderColor.replace('#', '')}/${secondaryTextColor.replace('#', '')}/png?text=Brand+${i}`}
+                alt={`Brand ${i}`}
+              />
+            ))}
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* Features Section */}
+      <Box as="section" py={20}>
+        <Container maxW="1200px">
+          <VStack gap={6} mb={16}>
+            <Heading as="h2" fontSize={{ base: "2xl", md: "3xl" }} textAlign="center">
+              主要功能特色
+            </Heading>
+            
+            <Text 
+              fontSize={{ base: "md", md: "lg" }} 
+              color={secondaryTextColor} 
+              textAlign="center"
+              maxW="800px"
+            >
+              MindTube 提供多種強大功能，幫助你快速消化和整理影片內容，提升學習效率和知識吸收。
+            </Text>
+          </VStack>
+          
+          <Grid 
+            templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+            gap={8}
+          >
+            {features.map((feature, idx) => (
+              <Box
+                key={idx}
+                bg={cardBg}
+                p={8}
+                borderRadius="lg"
+                boxShadow="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <Flex
+                  w={12}
+                  h={12}
+                  borderRadius="full"
+                  bg={`rgba(120, 86, 255, 0.1)`}
+                  justify="center"
+                  align="center"
+                  mb={4}
+                >
+                  <Icon as={feature.icon} fontSize="xl" color={primaryColor} />
+                </Flex>
+                
+                <Heading as="h3" fontSize="xl" mb={4}>
+                  {feature.title}
+                </Heading>
+                
+                <Text color={secondaryTextColor}>
+                  {feature.description}
+                </Text>
+              </Box>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* How It Works Section */}
+      <Box as="section" bg={brandsSectionBg} py={20}>
+        <Container maxW="1200px">
+          <VStack gap={6} mb={16}>
+            <Heading as="h2" fontSize={{ base: "2xl", md: "3xl" }} textAlign="center">
+              使用流程
+            </Heading>
+            
+            <Text 
+              fontSize={{ base: "md", md: "lg" }} 
+              color={secondaryTextColor} 
+              textAlign="center"
+              maxW="800px"
+            >
+              MindTube 的使用過程簡單直覺，只需三個步驟，即可將冗長影片轉換為清晰的思維導圖。
+            </Text>
+          </VStack>
+          
+          <Stack
+            direction={{ base: "column", md: "row" }}
+            gap={{ base: 8, md: 4 }}
+            justify="space-between"
+            align="center"
+          >
+            {steps.map((step, idx) => (
+              <React.Fragment key={idx}>
+                <VStack gap={4} flex="1" textAlign="center">
+                  <Flex
+                    w={16}
+                    h={16}
+                    borderRadius="full"
+                    bg={primaryColor}
+                    color="white"
+                    justify="center"
+                    align="center"
+                    fontSize="2xl"
+                    fontWeight="bold"
+                  >
+                    {idx + 1}
+                  </Flex>
+                  
+                  <Heading as="h3" fontSize="xl">
+                    {step.title}
+                  </Heading>
+                  
+                  <Text color={secondaryTextColor}>
+                    {step.description}
+                  </Text>
+                </VStack>
+                
+                {idx < steps.length - 1 && (
+                  <Icon
+                    as={FaArrowRight}
+                    fontSize="2xl"
+                    color={secondaryTextColor}
+                    display={{ base: "none", md: "block" }}
+                  />
+                )}
+              </React.Fragment>
+            ))}
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* Call to Action */}
+      <Box as="section" py={20}>
+        <Container maxW="800px">
+          <VStack
+            gap={8}
+            p={8}
+            borderRadius="lg"
+            bg={cardBg}
+            boxShadow="xl"
+            border="1px solid"
+            borderColor={borderColor}
+            textAlign="center"
+          >
+            <Heading as="h2" fontSize={{ base: "2xl", md: "3xl" }}>
+              開始將您的 YouTube 影片轉換為思維導圖
+            </Heading>
+            
+            <Text fontSize={{ base: "md", md: "lg" }} color={secondaryTextColor}>
+              免費註冊並開始體驗 AI 輔助的影片摘要與思維導圖生成。
+            </Text>
+            
+            <Link to="/signup" activeOptions={{ exact: true }}>
+              <Button size="lg" colorScheme="purple" px={8}>
+                立即免費註冊
+              </Button>
+            </Link>
+            
+            <Text fontSize="sm" color={secondaryTextColor}>
+              無需信用卡，每月可免費使用 5 次
+            </Text>
+          </VStack>
+        </Container>
+      </Box>
+    </Box>
+  );
+}
+
+const features = [
+  {
+    title: "自動擷取字幕",
+    description: "系統自動從 YouTube 影片中提取完整字幕，支援多語言影片，無需手動輸入或複製貼上。",
+    icon: FaPlay,
+  },
+  {
+    title: "AI 內容摘要",
+    description: "運用先進的自然語言處理技術，智能分析影片內容，提取關鍵點並生成結構化大綱。",
+    icon: FaPlay,
+  },
+  {
+    title: "互動式思維導圖",
+    description: "將 AI 生成的大綱轉換為視覺化思維導圖，支援展開、收合、縮放等互動功能，幫助你理解內容層次。",
+    icon: FaPlay,
+  },
+  {
+    title: "多種匯出格式",
+    description: "支援將思維導圖匯出為 Markdown、PNG、SVG 等多種格式，方便保存、分享和用於其他筆記系統。",
+    icon: FaPlay,
+  },
+  {
+    title: "歷史記錄管理",
+    description: "自動儲存所有已處理的影片及其思維導圖，方便隨時查看和重新訪問，無需重複處理相同影片。",
+    icon: FaPlay,
+  },
+  {
+    title: "自訂摘要參數",
+    description: "可調整 AI 摘要的詳細程度、關注點和風格，滿足不同學習者和不同類型內容的需求。",
+    icon: FaPlay,
+  },
+];
+
+const steps = [
+  {
+    title: "貼入 YouTube 連結",
+    description: "複製您想要轉換為思維導圖的 YouTube 影片連結，粘貼到系統輸入框中。",
+  },
+  {
+    title: "AI 自動處理",
+    description: "系統自動提取字幕，利用 AI 分析內容，提取關鍵點並生成結構化摘要。",
+  },
+  {
+    title: "獲取思維導圖",
+    description: "查看生成的互動式思維導圖，可以自由展開、收合、縮放，或將其匯出為需要的格式。",
+  },
+]; 

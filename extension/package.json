@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production",
+    "package": "npm run build && mkdir -p release && zip -r release/mindtube-extension.zip manifest.json popup.html iframe.html styles.css icons font-awesome js/d3.min.js js/markmap-lib.min.js js/markmap-view.min.js js/lib dist"
+  }
+}
