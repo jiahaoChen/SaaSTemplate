@@ -8,8 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-    },
-    dedupe: ['markmap-view', 'markmap-lib']
+    }
   },
   css: {
     // Enable CSS modules and preprocessing
@@ -18,12 +17,11 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['markmap-view', 'markmap-lib'],
     exclude: []
   },
   build: {
     commonjsOptions: {
-      include: [/markmap-.*/, /node_modules/]
+      include: [/node_modules/]
     }
   },
   plugins: [react(), TanStackRouterVite()],

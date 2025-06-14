@@ -18,16 +18,11 @@ import { Route as LayoutImport } from './routes/_layout'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password.route'
 import { Route as RecoverPasswordRouteImport } from './routes/recover-password.route'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
-import { Route as ApiExtensionAuthImport } from './routes/api.extension-auth'
 import { Route as LayoutSubscriptionImport } from './routes/_layout/subscription'
 import { Route as LayoutSettingsImport } from './routes/_layout/settings'
 import { Route as LayoutProfileImport } from './routes/_layout/profile'
 import { Route as LayoutHelpImport } from './routes/_layout/help'
 import { Route as LayoutFeedbackImport } from './routes/_layout/feedback'
-import { Route as LayoutMindmapPublicLibraryImport } from './routes/_layout/mindmap/public-library'
-import { Route as LayoutMindmapLibraryImport } from './routes/_layout/mindmap/library'
-import { Route as LayoutMindmapCreateImport } from './routes/_layout/mindmap/create'
-import { Route as LayoutMindmapDetailIdImport } from './routes/_layout/mindmap/detail/$id'
 
 // Create/Update Routes
 
@@ -66,11 +61,6 @@ const LayoutIndexRoute = LayoutIndexImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const ApiExtensionAuthRoute = ApiExtensionAuthImport.update({
-  path: '/api/extension-auth',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const LayoutSubscriptionRoute = LayoutSubscriptionImport.update({
   path: '/subscription',
   getParentRoute: () => LayoutRoute,
@@ -93,28 +83,6 @@ const LayoutHelpRoute = LayoutHelpImport.update({
 
 const LayoutFeedbackRoute = LayoutFeedbackImport.update({
   path: '/feedback',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutMindmapPublicLibraryRoute = LayoutMindmapPublicLibraryImport.update(
-  {
-    path: '/mindmap/public-library',
-    getParentRoute: () => LayoutRoute,
-  } as any,
-)
-
-const LayoutMindmapLibraryRoute = LayoutMindmapLibraryImport.update({
-  path: '/mindmap/library',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutMindmapCreateRoute = LayoutMindmapCreateImport.update({
-  path: '/mindmap/create',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutMindmapDetailIdRoute = LayoutMindmapDetailIdImport.update({
-  path: '/mindmap/detail/$id',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -166,28 +134,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSubscriptionImport
       parentRoute: typeof LayoutImport
     }
-    '/api/extension-auth': {
-      preLoaderRoute: typeof ApiExtensionAuthImport
-      parentRoute: typeof rootRoute
-    }
     '/_layout/': {
       preLoaderRoute: typeof LayoutIndexImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/mindmap/create': {
-      preLoaderRoute: typeof LayoutMindmapCreateImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/mindmap/library': {
-      preLoaderRoute: typeof LayoutMindmapLibraryImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/mindmap/public-library': {
-      preLoaderRoute: typeof LayoutMindmapPublicLibraryImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/mindmap/detail/$id': {
-      preLoaderRoute: typeof LayoutMindmapDetailIdImport
       parentRoute: typeof LayoutImport
     }
   }
@@ -205,15 +153,10 @@ export const routeTree = rootRoute.addChildren([
     LayoutSettingsRoute,
     LayoutSubscriptionRoute,
     LayoutIndexRoute,
-    LayoutMindmapCreateRoute,
-    LayoutMindmapLibraryRoute,
-    LayoutMindmapPublicLibraryRoute,
-    LayoutMindmapDetailIdRoute,
   ]),
   LandingRoute,
   LoginRoute,
   SignupRoute,
-  ApiExtensionAuthRoute,
 ])
 
 /* prettier-ignore-end */

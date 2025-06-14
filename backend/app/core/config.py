@@ -1,6 +1,5 @@
 import secrets
 import warnings
-import google.generativeai as genai
 from typing import Any, Literal, cast
 
 from pydantic import (
@@ -29,12 +28,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     FRONTEND_HOST: str = "http://localhost:5173"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
-
-    # AI API settings
-    # AI_API_KEY is expected to be set as an environment variable (e.g., in .env)
-    AI_API_KEY: str | None = Field(default=None)
-    AI_MODEL_NAME: str = "gemini-2.5-pro-preview-05-06"  # Default Gemini model name
-    AVAILABLE_GEMINI_MODELS: list[str] = Field(default_factory=list) # Populated by _populate_available_gemini_models validator
 
     # Read BACKEND_CORS_ORIGINS from .env as a simple string
     # Use alias to map the environment variable name
@@ -110,53 +103,7 @@ class Settings(BaseSettings):
             self.EMAILS_FROM_NAME = self.PROJECT_NAME
         return self
 
-    @model_validator(mode="after")
-    def _populate_available_gemini_models(self) -> Self:
-        fetched_models_list: list[str] = []
-        # Fallback list includes the default model to ensure it's always an option
-        fallback_models = sorted(list(set([
-            "gemini-2.5-pro-preview-05-06"
-        ])))
 
-        if self.AI_API_KEY:
-            try:
-                genai.configure(api_key=self.AI_API_KEY)
-                for m in genai.list_models():
-                    if 'generateContent' in m.supported_generation_methods:
-                        model_name_parts = m.name.split('/')
-                        if len(model_name_parts) == 2: # e.g. "models/gemini-1.5-pro-latest" -> "gemini-1.5-pro-latest"
-                            fetched_models_list.append(model_name_parts[1])
-                
-                if fetched_models_list:
-                    current_available = sorted(list(set(fetched_models_list)))
-                    if self.AI_MODEL_NAME not in current_available:
-                        warnings.warn(
-                            f"Default AI_MODEL_NAME '{self.AI_MODEL_NAME}' is not in the dynamically fetched "
-                            f"list of available models: {current_available}. "
-                            f"'{self.AI_MODEL_NAME}' will be added to the list. "
-                            "Consider updating AI_MODEL_NAME if it's not an intended experimental/new model.",
-                            UserWarning,
-                            stacklevel=2
-                        )
-                        current_available.append(self.AI_MODEL_NAME)
-                        current_available = sorted(list(set(current_available)))
-                    self.AVAILABLE_GEMINI_MODELS = current_available
-                else: # API call succeeded but returned no usable models
-                    warnings.warn(
-                        "Dynamically fetched Gemini models list is empty. Falling back to a default list for AVAILABLE_GEMINI_MODELS.", UserWarning, stacklevel=2
-                    )
-                    self.AVAILABLE_GEMINI_MODELS = fallback_models
-            except Exception as e:
-                warnings.warn(
-                    f"Failed to dynamically populate AVAILABLE_GEMINI_MODELS due to an error: {e}. Falling back to a default list.", UserWarning, stacklevel=2
-                )
-                self.AVAILABLE_GEMINI_MODELS = fallback_models
-        else: # No API Key
-            warnings.warn(
-                "AI_API_KEY is not set. Cannot dynamically populate AVAILABLE_GEMINI_MODELS. Falling back to a default list.", UserWarning, stacklevel=2
-            )
-            self.AVAILABLE_GEMINI_MODELS = fallback_models
-        return self
 
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
 

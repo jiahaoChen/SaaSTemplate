@@ -15,7 +15,6 @@ from app.core.security import get_password_hash, verify_password
 from app.models import (
     Item,
     Message,
-    MindMap,
     UpdatePassword,
     User,
     UserCreate,
@@ -83,14 +82,6 @@ def update_user_me(
     """
     Update own user.
     """
-
-    if user_in.preferred_gemini_model and user_in.preferred_gemini_model not in settings.AVAILABLE_GEMINI_MODELS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid preferred Gemini model: '{user_in.preferred_gemini_model}'. "
-            f"Available models are: {', '.join(settings.AVAILABLE_GEMINI_MODELS)}",
-        )
-
     if user_in.email:
         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
         if existing_user and existing_user.id != current_user.id:
@@ -143,16 +134,12 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
 
-    # Delete related items and mindmaps explicitly since we're not using SQLAlchemy's cascade
+    # Delete related items explicitly since we're not using SQLAlchemy's cascade
     user_id = current_user.id
 
     # Delete the user's items
     items_statement = delete(Item).where(col(Item.owner_id) == user_id)
     session.exec(items_statement)  # type: ignore
-
-    # Delete the user's mindmaps
-    mindmaps_statement = delete(MindMap).where(col(MindMap.user_id) == user_id)
-    session.exec(mindmaps_statement)  # type: ignore
 
     session.delete(current_user)
     session.commit()
@@ -243,10 +230,6 @@ def delete_user(
     # Delete the user's items explicitly
     items_statement = delete(Item).where(col(Item.owner_id) == user_id)
     session.exec(items_statement)  # type: ignore
-
-    # Delete the user's mindmaps explicitly
-    mindmaps_statement = delete(MindMap).where(col(MindMap.user_id) == user_id)
-    session.exec(mindmaps_statement)  # type: ignore
 
     session.delete(user)
     session.commit()
