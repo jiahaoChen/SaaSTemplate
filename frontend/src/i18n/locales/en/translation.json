@@ -128,7 +128,8 @@
     "logoutSuccess": "Signed out successfully",
     "invalidCredentials": "Invalid email or password",
     "passwordResetSent": "Password reset email sent",
-    "passwordResetSuccess": "Password reset successfully"
+    "passwordResetSuccess": "Password reset successfully",
+    "logout": "Logout"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -161,7 +162,8 @@
     "monthlyUsage": "Monthly Usage",
     "thisMonthGenerated": "Generated this month",
     "dashboard": "Dashboard",
-    "professionalEdition": "VIP"
+    "professionalEdition": "VIP",
+    "profile": "Profile"
   },
   "items": {
     "title": "Items Management",

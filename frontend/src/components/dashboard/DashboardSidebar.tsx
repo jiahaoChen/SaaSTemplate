@@ -1,19 +1,151 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Text, Icon } from "@chakra-ui/react";
+import styled from 'styled-components';
+import { Typography } from "antd";
 import { Link, useRouter } from "@tanstack/react-router";
-import { colors } from "../../theme/tokens";
-import { useColorModeValue } from "../../components/ui/color-mode";
 import { useTranslation } from "react-i18next";
+import { useColorModeValue } from "@/components/ui/color-mode";
 import {
   FaHome,
   FaPlusCircle,
-  FaSitemap,
   FaCog,
   FaCrown,
   FaCommentAlt,
   FaBars,
-  FaGlobe,
 } from "react-icons/fa";
+
+const { Text } = Typography;
+
+const SidebarContainer = styled.aside<{ $bg: string; $borderColor: string }>`
+  background: ${props => props.$bg};
+  border-right: 1px solid ${props => props.$borderColor};
+  height: calc(100vh - 70px);
+  position: sticky;
+  top: 70px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 900;
+  width: 250px;
+  
+  @media (max-width: 768px) {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+    transform: ${props => props.style?.transform};
+    z-index: 1000;
+  }
+`;
+
+const MobileMenuButton = styled.div<{ $bg: string }>`
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  cursor: pointer;
+  background: ${props => props.$bg};
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const SidebarContent = styled.div`
+  padding: 20px 0;
+`;
+
+const SidebarHeader = styled.div`
+  display: flex;
+  padding: 0 24px;
+  margin-bottom: 24px;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const SidebarTitle = styled(Text)<{ $color: string }>`
+  font-size: 20px;
+  font-weight: bold;
+  color: ${props => props.$color};
+`;
+
+const MobileCloseIcon = styled.div`
+  display: none;
+  cursor: pointer;
+  
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const SectionContainer = styled.div`
+  margin-bottom: 24px;
+`;
+
+const SectionTitle = styled(Text)<{ $color: string }>`
+  font-size: 12px;
+  font-weight: bold;
+  color: ${props => props.$color};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 32px;
+  margin-bottom: 8px;
+`;
+
+const SidebarLinkContainer = styled(Link)<{ 
+  $isActive: boolean; 
+  $activeBg: string; 
+  $inactiveBg: string; 
+  $hoverBg: string; 
+  $textColor: string; 
+  $primaryColor: string;
+}>`
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  margin: 0 8px;
+  color: ${props => props.$textColor};
+  background: ${props => props.$isActive ? props.$activeBg : props.$inactiveBg};
+  border-right: ${props => props.$isActive ? `3px solid ${props.$primaryColor}` : '0px'};
+  font-weight: ${props => props.$isActive ? '500' : 'normal'};
+  transition: all 0.3s;
+  cursor: pointer;
+  border-radius: 6px;
+  text-decoration: none;
+  
+  &:hover {
+    background: ${props => !props.$isActive ? props.$hoverBg : props.$activeBg};
+    color: ${props => props.$textColor};
+    text-decoration: none;
+  }
+`;
+
+const IconWrapper = styled.div`
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Overlay = styled.div<{ $bg: string }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: ${props => props.$bg};
+  z-index: 800;
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
 
 interface SidebarLinkProps {
   to: string;
@@ -25,46 +157,35 @@ interface SidebarLinkProps {
 
 const SidebarLink: React.FC<SidebarLinkProps> = ({ 
   to, 
-  icon, 
+  icon: Icon, 
   label, 
   isActive = false,
   onClick
 }) => {
-  const activeBg = useColorModeValue(colors.primary[50], colors.primary[900]);
-  const inactiveBg = useColorModeValue("transparent", "transparent");
-  const hoverBg = useColorModeValue("blue.100", "blue.900");
+  const activeBg = useColorModeValue('rgba(22, 119, 255, 0.1)', 'rgba(22, 119, 255, 0.2)');
+  const hoverBg = useColorModeValue('rgba(22, 119, 255, 0.05)', 'rgba(22, 119, 255, 0.1)');
   const textColor = useColorModeValue(
-    isActive ? colors.primary[500] : "gray.700", 
-    isActive ? colors.primary[300] : "gray.300"
+    isActive ? '#1677ff' : '#595959',
+    isActive ? '#69b7ff' : '#d9d9d9'
   );
+  const primaryColor = '#1677ff';
 
   return (
-    <Link to={to} onClick={onClick}>
-      <Flex
-        align="center"
-        py={3}
-        px={6}
-        color={textColor}
-        bg={isActive ? activeBg : inactiveBg}
-        borderRightWidth={isActive ? "3px" : "0px"}
-        borderRightColor={colors.primary[500]}
-        fontWeight={isActive ? "500" : "normal"}
-        transition="all 0.3s"
-        _hover={
-          !isActive
-            ? {
-                bg: hoverBg,
-              }
-            : {}
-        }
-        cursor="pointer"
-        borderRadius="md"
-        mx={2}
-      >
-        <Icon as={icon} mr={3} boxSize={5} />
-        <Text>{label}</Text>
-      </Flex>
-    </Link>
+    <SidebarLinkContainer
+      to={to}
+      onClick={onClick}
+      $isActive={isActive}
+      $activeBg={activeBg}
+      $inactiveBg="transparent"
+      $hoverBg={hoverBg}
+      $textColor={textColor}
+      $primaryColor={primaryColor}
+    >
+      <IconWrapper>
+        <Icon size={20} />
+      </IconWrapper>
+      <Text>{label}</Text>
+    </SidebarLinkContainer>
   );
 };
 
@@ -74,23 +195,15 @@ interface SidebarSectionProps {
 }
 
 const SidebarSection: React.FC<SidebarSectionProps> = ({ title, children }) => {
-  const textColor = useColorModeValue("gray.500", "gray.500");
+  const textColor = useColorModeValue('#8c8c8c', '#8c8c8c');
   
   return (
-    <Box mb={6}>
-      <Text 
-        fontSize="xs" 
-        fontWeight="bold" 
-        color={textColor} 
-        textTransform="uppercase" 
-        letterSpacing="wide"
-        px={8}
-        mb={2}
-      >
+    <SectionContainer>
+      <SectionTitle $color={textColor}>
         {title}
-      </Text>
+      </SectionTitle>
       {children}
-    </Box>
+    </SectionContainer>
   );
 };
 
@@ -101,13 +214,12 @@ const DashboardSidebar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
   
-  // Background and border colors based on color mode
-  const bg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  // const headerBg = useColorModeValue("white", "gray.800");
-  const textColor = useColorModeValue("black", "white");
-  const overlayBg = useColorModeValue("blackAlpha.600", "blackAlpha.800");
-  const menuButtonBg = useColorModeValue("white", "gray.700");
+  // Colors based on theme
+  const bg = useColorModeValue('#ffffff', '#001529');
+  const borderColor = useColorModeValue('#d9d9d9', '#303030');
+  const textColor = useColorModeValue('#000000', '#ffffff');
+  const overlayBg = useColorModeValue('rgba(0, 0, 0, 0.6)', 'rgba(0, 0, 0, 0.8)');
+  const menuButtonBg = useColorModeValue('#ffffff', '#262626');
   
   // Update active link whenever the route changes
   useEffect(() => {
@@ -162,52 +274,30 @@ const DashboardSidebar: React.FC = () => {
   return (
     <>
       {/* Mobile menu button */}
-      <Flex
-        display={{ base: "flex", md: "none" }}
-        position="fixed"
-        top="20px"
-        left="20px"
-        zIndex={1000}
+      <MobileMenuButton 
+        $bg={menuButtonBg}
         onClick={toggleMobileMenu}
-        cursor="pointer"
-        bg={menuButtonBg}
-        p={2}
-        borderRadius="md"
-        boxShadow="md"
       >
-        <Icon as={FaBars} boxSize={6} />
-      </Flex>
+        <FaBars size={24} />
+      </MobileMenuButton>
 
       {/* Sidebar for both desktop and mobile */}
-      <Box
-        as="aside"
-        bg={bg}
-        borderRight="1px solid"
-        borderRightColor={borderColor}
-        height="calc(100vh - 70px)"
-        position="sticky"
-        top="70px"
-        w={{ base: isMobileMenuOpen ? "250px" : "0", md: "250px" }}
-        overflow={isMobileMenuOpen ? "visible" : "hidden"}
-        display={{ base: isMobileMenuOpen ? "block" : "none", md: "block" }}
-        overflowY="auto"
-        transition="all 0.3s ease"
-        zIndex={900}
-        boxShadow={{ base: isMobileMenuOpen ? "lg" : "none", md: "none" }}
+      <SidebarContainer
+        $bg={bg}
+        $borderColor={borderColor}
+        style={{
+          transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)'
+        }}
       >
-        <Box py={5}>
-          <Flex px={6} mb={6} alignItems="center" justifyContent="space-between">
-            <Text fontSize="xl" fontWeight="bold" color={textColor}>SaaS Template</Text>
+        <SidebarContent>
+          <SidebarHeader>
+            <SidebarTitle $color={textColor}>SaaS Template</SidebarTitle>
             {isMobileMenuOpen && (
-              <Flex 
-                display={{ base: "flex", md: "none" }}
-                onClick={toggleMobileMenu}
-                cursor="pointer"
-              >
-                <Icon as={FaBars} boxSize={5} />
-              </Flex>
+              <MobileCloseIcon onClick={toggleMobileMenu}>
+                <FaBars size={20} />
+              </MobileCloseIcon>
             )}
-          </Flex>
+          </SidebarHeader>
 
           <SidebarSection title={t('dashboard.main')}>
             <SidebarLink
@@ -226,13 +316,6 @@ const DashboardSidebar: React.FC = () => {
             />
           </SidebarSection>
           <SidebarSection title={t('dashboard.account')}>
-            {/* <SidebarLink
-              to="/profile"
-              icon={FaUser}
-              label={t('dashboard.profile')}
-              isActive={activeLink === "profile"}
-              onClick={handleMobileMenuClick}
-            /> */}
             <SidebarLink
               to="/settings"
               icon={FaCog}
@@ -249,13 +332,6 @@ const DashboardSidebar: React.FC = () => {
             />
           </SidebarSection>
           <SidebarSection title="Support">
-            {/* <SidebarLink
-              to="/help"
-              icon={FaQuestionCircle}
-              label="Help Center"
-              isActive={activeLink === "help"}
-              onClick={handleMobileMenuClick}
-            /> */}
             <SidebarLink
               to="/feedback"
               icon={FaCommentAlt}
@@ -264,26 +340,16 @@ const DashboardSidebar: React.FC = () => {
               onClick={handleMobileMenuClick}
             />
           </SidebarSection>
-        </Box>
-      </Box>
+        </SidebarContent>
+      </SidebarContainer>
 
       {/* Overlay when mobile menu is open */}
       {isMobileMenuOpen && (
-        <Box 
-          position="fixed"
-          top="0"
-          left="0"
-          right="0"
-          bottom="0"
-          bg={overlayBg}
-          zIndex={800}
-          display={{ base: "block", md: "none" }}
+        <Overlay 
+          $bg={overlayBg}
           onClick={toggleMobileMenu}
         />
       )}
-
-      {/* Main content area with padding for both mobile and desktop */}
-     
     </>
   );
 };

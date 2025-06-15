@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Flex, Text } from '@chakra-ui/react';
+import { Button, Dropdown, Space, Typography } from 'antd';
+import type { MenuProps } from 'antd';
 import { LuGlobe } from 'react-icons/lu';
-import { useColorModeValue } from './color-mode';
-import { 
-  MenuRoot, 
-  MenuTrigger, 
-  MenuContent,
-  MenuItem
-} from './menu';
 import useLanguage from '@/hooks/useLanguage';
 import useAnalytics from '@/hooks/useAnalytics';
+
+const { Text } = Typography;
 
 export const LanguageSwitcher: React.FC = () => {
   const { t, currentLanguage, changeLanguage, getLanguageName } = useLanguage();
@@ -32,12 +28,6 @@ export const LanguageSwitcher: React.FC = () => {
     };
   }, [currentLanguage]);
 
-  // Color settings for dark mode
-  const menuBg = useColorModeValue('white', 'gray.800');
-  const menuBorderColor = useColorModeValue('gray.200', 'gray.700');
-  const menuItemHoverBg = useColorModeValue('gray.100', 'gray.700');
-  const textColor = useColorModeValue('gray.800', 'white');
-
   // Map of language codes to their names in their own language
   const languages = {
     'en': 'English',
@@ -59,41 +49,34 @@ export const LanguageSwitcher: React.FC = () => {
     }
   };
 
+  // Create menu items for Ant Design Dropdown
+  const items: MenuProps['items'] = Object.entries(languages).map(([code, name]) => ({
+    key: code,
+    label: name,
+    onClick: () => handleLanguageClick(code),
+    style: {
+      fontWeight: languageState === code ? 500 : 400,
+      backgroundColor: languageState === code ? 'rgba(22, 119, 255, 0.1)' : 'transparent',
+    }
+  }));
+
   return (
-    <MenuRoot>
-      <MenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="md"
-          aria-label={t('common.language')}
-        >
-          <Flex alignItems="center" gap={2}>
-            <LuGlobe />
-            <Text>{getLanguageName(languageState as 'en' | 'zh' | 'zh-CN')}</Text>
-          </Flex>
-        </Button>
-      </MenuTrigger>
-      <MenuContent 
-        bg={menuBg} 
-        borderColor={menuBorderColor}
-        boxShadow="md"
+    <Dropdown 
+      menu={{ items }} 
+      placement="bottomRight"
+      trigger={['click']}
+      arrow
+    >
+      <Button 
+        type="text" 
+        size="middle"
+        aria-label={t('common.language')}
       >
-        {Object.entries(languages).map(([code, name]) => (
-          <MenuItem
-            key={code}
-            value={code}
-            onClick={() => handleLanguageClick(code)}
-            css={{
-              bg: languageState === code ? menuItemHoverBg : 'transparent',
-              color: textColor,
-              fontWeight: languageState === code ? 'medium' : 'normal',
-              '&:hover': { bg: menuItemHoverBg }
-            }}
-          >
-            {name}
-          </MenuItem>
-        ))}
-      </MenuContent>
-    </MenuRoot>
+        <Space align="center">
+          <LuGlobe />
+          <Text>{getLanguageName(languageState as 'en' | 'zh' | 'zh-CN')}</Text>
+        </Space>
+      </Button>
+    </Dropdown>
   );
 }; 

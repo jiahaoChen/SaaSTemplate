@@ -1,23 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
-
-import {
-  Button,
-  DialogActionTrigger,
-  DialogRoot,
-  DialogTrigger,
-  Flex,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react"
 import { useState } from "react"
 import { FaExchangeAlt } from "react-icons/fa"
+import { Input as AntdInput } from "antd"
+import styled from "styled-components"
 
 import { type UserPublic, type UserUpdate, UsersService } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { emailPattern, handleError } from "@/utils"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "../ui/checkbox"
 import {
   DialogBody,
@@ -25,9 +17,29 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogRoot,
+  DialogTrigger,
 } from "../ui/dialog"
 import { Field } from "../ui/field"
+import { VStack, Text } from "../ui/styled"
+
+const StyledDialogTitle = styled.h2`
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: inherit;
+`
+
+const FormContainer = styled.form`
+  width: 100%;
+`
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+`
 
 interface EditUserProps {
   user: UserPublic
@@ -79,32 +91,29 @@ const EditUser = ({ user }: EditUserProps) => {
 
   return (
     <DialogRoot
-      size={{ base: "xs", md: "md" }}
-      placement="center"
       open={isOpen}
-      onOpenChange={({ open }) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
     >
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <FaExchangeAlt fontSize="16px" />
+      <DialogTrigger onClick={() => setIsOpen(true)}>
+        <Button variant="outlined" size="small">
+          <FaExchangeAlt fontSize="16px" style={{ marginRight: '4px' }} />
           Edit User
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <StyledDialogTitle>Edit User</StyledDialogTitle>
           </DialogHeader>
           <DialogBody>
             <Text mb={4}>Update the user details below.</Text>
             <VStack gap={4}>
               <Field
                 required
-                invalid={!!errors.email}
                 errorText={errors.email?.message}
                 label="Email"
               >
-                <Input
+                <AntdInput
                   id="email"
                   {...register("email", {
                     required: "Email is required",
@@ -112,28 +121,28 @@ const EditUser = ({ user }: EditUserProps) => {
                   })}
                   placeholder="Email"
                   type="email"
+                  size="middle"
                 />
               </Field>
 
               <Field
-                invalid={!!errors.full_name}
                 errorText={errors.full_name?.message}
                 label="Full Name"
               >
-                <Input
+                <AntdInput
                   id="name"
                   {...register("full_name")}
                   placeholder="Full name"
                   type="text"
+                  size="middle"
                 />
               </Field>
 
               <Field
-                invalid={!!errors.password}
                 errorText={errors.password?.message}
                 label="Set Password"
               >
-                <Input
+                <AntdInput.Password
                   id="password"
                   {...register("password", {
                     minLength: {
@@ -142,16 +151,15 @@ const EditUser = ({ user }: EditUserProps) => {
                     },
                   })}
                   placeholder="Password"
-                  type="password"
+                  size="middle"
                 />
               </Field>
 
               <Field
-                invalid={!!errors.confirm_password}
                 errorText={errors.confirm_password?.message}
                 label="Confirm Password"
               >
-                <Input
+                <AntdInput.Password
                   id="confirm_password"
                   {...register("confirm_password", {
                     validate: (value) =>
@@ -159,20 +167,20 @@ const EditUser = ({ user }: EditUserProps) => {
                       "The passwords do not match",
                   })}
                   placeholder="Password"
-                  type="password"
+                  size="middle"
                 />
               </Field>
             </VStack>
 
-            <Flex mt={4} direction="column" gap={4}>
+            <CheckboxContainer>
               <Controller
                 control={control}
                 name="is_superuser"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
+                  <Field>
                     <Checkbox
                       checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
+                      onChange={(e) => field.onChange(e.target.checked)}
                     >
                       Is superuser?
                     </Checkbox>
@@ -183,35 +191,31 @@ const EditUser = ({ user }: EditUserProps) => {
                 control={control}
                 name="is_active"
                 render={({ field }) => (
-                  <Field disabled={field.disabled} colorPalette="teal">
+                  <Field>
                     <Checkbox
                       checked={field.value}
-                      onCheckedChange={({ checked }) => field.onChange(checked)}
+                      onChange={(e) => field.onChange(e.target.checked)}
                     >
                       Is active?
                     </Checkbox>
                   </Field>
                 )}
               />
-            </Flex>
+            </CheckboxContainer>
           </DialogBody>
 
-          <DialogFooter gap={2}>
-            <DialogActionTrigger asChild>
-              <Button
-                variant="subtle"
-                colorPalette="gray"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-            </DialogActionTrigger>
-            <Button variant="solid" type="submit" loading={isSubmitting}>
-              Save
+          <DialogFooter>
+            <DialogCloseTrigger onClick={() => setIsOpen(false)}>
+              <Button variant="outlined">Cancel</Button>
+            </DialogCloseTrigger>
+            <Button
+              htmlType="submit"
+              loading={isSubmitting}
+            >
+              Update User
             </Button>
           </DialogFooter>
-          <DialogCloseTrigger />
-        </form>
+        </FormContainer>
       </DialogContent>
     </DialogRoot>
   )

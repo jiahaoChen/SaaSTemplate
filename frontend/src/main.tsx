@@ -18,6 +18,9 @@ import i18n from "./i18n"
 // Import analytics
 import { initializeAnalytics } from "./utils/analytics"
 
+// Import global styles
+import "./styles/globals.css"
+
 OpenAPI.BASE = import.meta.env.VITE_API_URL
 OpenAPI.TOKEN = async () => {
   return localStorage.getItem("access_token") || ""

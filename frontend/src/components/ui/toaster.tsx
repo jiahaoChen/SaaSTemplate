@@ -1,43 +1,140 @@
 "use client"
 
-import {
-  Toaster as ChakraToaster,
-  Portal,
-  Spinner,
-  Stack,
-  Toast,
-  createToaster,
-} from "@chakra-ui/react"
+import { message, notification } from "antd"
+import { InfoCircleOutlined } from "@ant-design/icons"
 
-export const toaster = createToaster({
-  placement: "bottom-end",
-  pauseOnPageIdle: true,
+// Configure message and notification globally
+message.config({
+  top: 10,
+  duration: 3,
+  maxCount: 3,
 })
 
+notification.config({
+  placement: 'bottomRight',
+  duration: 4.5,
+})
+
+interface ToastOptions {
+  title?: string
+  description?: string
+  type?: 'success' | 'error' | 'warning' | 'info' | 'loading'
+  duration?: number
+  action?: {
+    label: string
+    onClick: () => void
+  }
+}
+
+// Create a toaster object that mimics the Chakra UI API
+export const toaster = {
+  create: (options: ToastOptions) => {
+    const { title, description, type = 'info', duration, action } = options
+    
+    // If we have both title and description, use notification
+    if (title && description) {
+      const config = {
+        message: title,
+        description: description,
+        duration: duration || 4.5,
+        btn: action ? (
+          <button
+            onClick={action.onClick}
+            style={{
+              border: 'none',
+              background: 'none',
+              color: '#1677ff',
+              cursor: 'pointer',
+              padding: 0,
+              textDecoration: 'underline',
+            }}
+          >
+            {action.label}
+          </button>
+        ) : undefined,
+      }
+      
+      switch (type) {
+        case 'success':
+          notification.success(config)
+          break
+        case 'error':
+          notification.error(config)
+          break
+        case 'warning':
+          notification.warning(config)
+          break
+        case 'info':
+          notification.info(config)
+          break
+        case 'loading':
+          notification.info({
+            ...config,
+            icon: <InfoCircleOutlined spin />,
+          })
+          break
+        default:
+          notification.info(config)
+      }
+    } else {
+      // For simple messages, use message
+      const messageContent = title || description || ''
+      
+      switch (type) {
+        case 'success':
+          message.success(messageContent)
+          break
+        case 'error':
+          message.error(messageContent)
+          break
+        case 'warning':
+          message.warning(messageContent)
+          break
+        case 'info':
+          message.info(messageContent)
+          break
+        case 'loading':
+          message.loading(messageContent)
+          break
+        default:
+          message.info(messageContent)
+      }
+    }
+  },
+  
+  success: (options: Omit<ToastOptions, 'type'>) => {
+    toaster.create({ ...options, type: 'success' })
+  },
+  
+  error: (options: Omit<ToastOptions, 'type'>) => {
+    toaster.create({ ...options, type: 'error' })
+  },
+  
+  warning: (options: Omit<ToastOptions, 'type'>) => {
+    toaster.create({ ...options, type: 'warning' })
+  },
+  
+  info: (options: Omit<ToastOptions, 'type'>) => {
+    toaster.create({ ...options, type: 'info' })
+  },
+  
+  loading: (options: Omit<ToastOptions, 'type'>) => {
+    toaster.create({ ...options, type: 'loading' })
+  },
+  
+  dismiss: () => {
+    message.destroy()
+    notification.destroy()
+  },
+  
+  dismissAll: () => {
+    message.destroy()
+    notification.destroy()
+  }
+}
+
+// The Toaster component is not needed as Ant Design handles this internally
+// But we export it for compatibility
 export const Toaster = () => {
-  return (
-    <Portal>
-      <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
-        {(toast) => (
-          <Toast.Root width={{ md: "sm" }}>
-            {toast.type === "loading" ? (
-              <Spinner size="sm" color="blue.solid" />
-            ) : (
-              <Toast.Indicator />
-            )}
-            <Stack gap="1" flex="1" maxWidth="100%">
-              {toast.title && <Toast.Title>{toast.title}</Toast.Title>}
-              {toast.description && (
-                <Toast.Description>{toast.description}</Toast.Description>
-              )}
-            </Stack>
-            {toast.action && (
-              <Toast.ActionTrigger>{toast.action.label}</Toast.ActionTrigger>
-            )}
-            {toast.meta?.closable && <Toast.CloseTrigger />}
-          </Toast.Root>
-        )}
-      </ChakraToaster>
-    </Portal>
-  )
+  return null
 }

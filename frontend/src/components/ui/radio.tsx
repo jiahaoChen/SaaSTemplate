@@ -1,24 +1,26 @@
-import { RadioGroup as ChakraRadioGroup } from "@chakra-ui/react"
+import { Radio as AntdRadio } from "antd"
+import type { RadioProps as AntdRadioProps } from "antd"
 import * as React from "react"
 
-export interface RadioProps extends ChakraRadioGroup.ItemProps {
+export interface RadioProps extends Omit<AntdRadioProps, 'children'> {
   rootRef?: React.Ref<HTMLDivElement>
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>
+  children?: React.ReactNode
 }
 
-export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
+export const Radio = React.forwardRef<any, RadioProps>(
   function Radio(props, ref) {
     const { children, inputProps, rootRef, ...rest } = props
+    
     return (
-      <ChakraRadioGroup.Item ref={rootRef} {...rest}>
-        <ChakraRadioGroup.ItemHiddenInput ref={ref} {...inputProps} />
-        <ChakraRadioGroup.ItemIndicator />
-        {children && (
-          <ChakraRadioGroup.ItemText>{children}</ChakraRadioGroup.ItemText>
-        )}
-      </ChakraRadioGroup.Item>
+      <AntdRadio
+        ref={ref}
+        {...rest}
+      >
+        {children}
+      </AntdRadio>
     )
   },
 )
 
-export const RadioGroup = ChakraRadioGroup.Root
+export const RadioGroup = AntdRadio.Group

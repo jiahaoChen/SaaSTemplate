@@ -1,13 +1,43 @@
-import { Box, Button, Container, Heading, VStack } from "@chakra-ui/react"
+import { Typography } from "antd"
 import { useMutation } from "@tanstack/react-query"
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { FiLock } from "react-icons/fi"
+import styled from "styled-components"
 
 import { type ApiError, type UpdatePassword, UsersService } from "@/client"
 import useCustomToast from "@/hooks/useCustomToast"
 import useLanguage from "@/hooks/useLanguage"
 import { confirmPasswordRules, handleError, passwordRules } from "@/utils"
 import { PasswordInput } from "../ui/password-input"
+import { Button } from "@/components/ui/button"
+
+const Container = styled.div`
+  max-width: 100%;
+  padding: 0 1rem;
+`
+
+const StyledHeading = styled(Typography.Title)`
+  font-size: 0.875rem !important;
+  padding: 16px 0 !important;
+  margin-bottom: 0 !important;
+`
+
+const FormContainer = styled.form``
+
+const VStackContainer = styled.div<{ w?: string }>`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: ${props => props.w || '100%'};
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+  
+  @media (min-width: 769px) {
+    width: ${props => props.w === 'sm' ? '384px' : props.w || '100%'};
+  }
+`
 
 interface UpdatePasswordForm extends UpdatePassword {
   confirm_password: string
@@ -45,12 +75,12 @@ const ChangePassword = () => {
 
   return (
     <>
-      <Container maxW="full">
-        <Heading size="sm" py={4}>
+      <Container>
+        <StyledHeading level={4}>
           {t("settings.changePasswordText")}
-        </Heading>
-        <Box as="form" onSubmit={handleSubmit(onSubmit)}>
-          <VStack gap={4} w={{ base: "100%", md: "sm" }}>
+        </StyledHeading>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
+          <VStackContainer w="sm">
             <PasswordInput
               type="current_password"
               startElement={<FiLock />}
@@ -72,17 +102,16 @@ const ChangePassword = () => {
               placeholder={t("settings.confirmNewPassword")}
               errors={errors}
             />
-          </VStack>
+          </VStackContainer>
           <Button
-            variant="solid"
-            mt={4}
-            type="submit"
+            style={{ marginTop: '16px' }}
+            htmlType="submit"
             loading={isSubmitting}
             disabled={!isValid}
           >
             {t("settings.updatePassword")}
           </Button>
-        </Box>
+        </FormContainer>
       </Container>
     </>
   )

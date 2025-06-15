@@ -1,9 +1,29 @@
-import { Flex } from "@chakra-ui/react"
+import styled from 'styled-components'
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 
 import { isLoggedIn } from "@/hooks/useAuth"
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar"
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar"
+
+const LayoutContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+`
+
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow-y: auto;
+`
 
 export const Route = createFileRoute("/_layout")({
   component: Layout,
@@ -19,15 +39,15 @@ export const Route = createFileRoute("/_layout")({
 function Layout() {
   console.log("admin layout render!!")
   return (
-    <Flex direction="column" h="100vh">
+    <LayoutContainer>
       <DashboardNavbar />
-      <Flex flex="1" overflow="hidden">
+      <ContentWrapper>
         <DashboardSidebar />
-        <Flex flex="1" direction="column" p={4} overflowY="auto">
+        <MainContent>
           <Outlet />
-        </Flex>
-      </Flex>
-    </Flex>
+        </MainContent>
+      </ContentWrapper>
+    </LayoutContainer>
   )
 }
 

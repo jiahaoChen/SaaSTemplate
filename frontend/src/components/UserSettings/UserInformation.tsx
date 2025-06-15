@@ -1,31 +1,68 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  Input,
-  Text,
-} from "@chakra-ui/react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Typography, Input as AntdInput } from "antd"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect } from "react"
 import { type SubmitHandler, useForm } from "react-hook-form"
-import { FiEye, FiEyeOff } from "react-icons/fi"
+
+import styled from "styled-components"
 
 import {
   type ApiError,
   type UserPublic,
   type UserUpdateMe,
   UsersService,
-  UtilsService,
 } from "@/client"
 import useAuth from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import { emailPattern, handleError } from "@/utils"
 import { Field } from "../ui/field"
-import { InputGroup } from "../ui/input-group"
+
 import useLanguage from "@/hooks/useLanguage"
-import { useColorModeValue } from "@/components/ui/color-mode"
+
+import { Button } from "@/components/ui/button"
+
+const Container = styled.div`
+  max-width: 100%;
+  padding: 0 1rem;
+`
+
+const StyledHeading = styled(Typography.Title)<{ fontWeight?: string }>`
+  font-size: 1rem !important;
+  padding: 20px 0 !important;
+  margin-bottom: 0 !important;
+  font-weight: ${props => props.fontWeight || 'bold'} !important;
+`
+
+const FormContainer = styled.form<{ w?: string }>`
+  width: 100%;
+  
+  @media (min-width: 640px) {
+    width: ${props => props.w === 'md' ? '448px' : props.w === 'lg' ? '512px' : '100%'};
+  }
+`
+
+const StyledText = styled(Typography.Text)<{ 
+  fontSize?: string
+  color?: string
+  truncate?: boolean
+  maxW?: string
+}>`
+  font-size: ${props => props.fontSize || 'inherit'} !important;
+  color: ${props => props.color} !important;
+  display: block;
+  padding: 8px 0;
+  ${props => props.truncate && `
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  `}
+  ${props => props.maxW && `max-width: ${props.maxW === 'full' ? '100%' : props.maxW};`}
+`
+
+const FlexContainer = styled.div<{ gap?: number }>`
+  display: flex;
+  margin-top: 16px;
+  gap: ${props => props.gap ? `${props.gap * 4}px` : '0'};
+`
 
 // Extended UserPublic interface to include gemini_api_key
 interface ExtendedUserPublic extends UserPublic {
@@ -44,7 +81,7 @@ const UserInformation = () => {
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
   const [editMode, setEditMode] = useState(false)
-  const [showApiKey, setShowApiKey] = useState(false)
+
   const { user: currentUser } = useAuth() as { user: ExtendedUserPublic | null }
   const { t } = useLanguage()
   
@@ -66,11 +103,8 @@ const UserInformation = () => {
     },
   })
 
-  const { data: availableModels, isLoading: isLoadingModels } = useQuery({
-    queryKey: ["availableGeminiModels"],
-    queryFn: () => UtilsService.getAvailableGeminiModels(), // Use the correct method name
-    staleTime: Infinity, // These models don't change often
-  })
+  // TODO: Implement getAvailableGeminiModels in backend
+  const availableModels = ['gemini-pro', 'gemini-pro-vision'] // Hardcoded for now
 
   // Set default model if none is selected and models are available
   useEffect(() => {
@@ -116,62 +150,58 @@ const UserInformation = () => {
 
   return (
     <>
-      <Container maxW="full">
-        <Heading size="md" py={5} fontWeight="bold">
+      <Container>
+        <StyledHeading level={3} fontWeight="bold">
           {t("settings.userInformation.title")}
-        </Heading>
-        <Box
-          w={{ sm: "full", md: "md", lg: "lg" }}
-          as="form"
+        </StyledHeading>
+        <FormContainer
+          w="lg"
           onSubmit={handleSubmit(onSubmit)}
         >
           <Field label={t("settings.userInformation.fullName")}>
             {editMode ? (
-              <Input
+              <AntdInput
                 {...register("full_name", { maxLength: 30 })}
                 type="text"
-                size="md"
-                width="full"
+                size="middle"
+                style={{ width: '100%' }}
               />
             ) : (
-              <Text
-                fontSize="md"
-                py={2}
+              <StyledText
+                fontSize="14px"
                 color={!currentUser?.full_name ? "gray" : "inherit"}
                 truncate
                 maxW="full"
               >
                 {currentUser?.full_name || t("common.notApplicable")}
-              </Text>
+              </StyledText>
             )}
           </Field>
           <Field
-            mt={4}
             label={t("auth.email")}
-            invalid={!!errors.email}
             errorText={errors.email?.message}
+            style={{ marginTop: '16px' }}
           >
             {editMode ? (
-              <Input
+              <AntdInput
                 {...register("email", {
                   required: t("validation.emailRequired"),
                   pattern: emailPattern,
                 })}
                 type="email"
-                size="md"
-                width="full"
+                size="middle"
+                style={{ width: '100%' }}
               />
             ) : (
-              <Text fontSize="md" py={2} truncate maxW="full">
+              <StyledText fontSize="14px" truncate maxW="full">
                 {currentUser?.email}
-              </Text>
+              </StyledText>
             )}
           </Field>
-          <Flex mt={4} gap={3}>
+          <FlexContainer gap={3}>
             <Button
-              variant="solid"
               onClick={toggleEditMode}
-              type={editMode ? "button" : "submit"}
+              htmlType={editMode ? "button" : "submit"}
               loading={editMode ? isSubmitting : false}
               disabled={editMode ? !isDirty || !getValues("email") : false}
             >
@@ -179,16 +209,15 @@ const UserInformation = () => {
             </Button>
             {editMode && (
               <Button
-                variant="subtle"
-                colorScheme="gray"
+                style={{ background: 'transparent', color: '#666' }}
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
                 {t("common.cancel")}
               </Button>
             )}
-          </Flex>
-        </Box>
+          </FlexContainer>
+        </FormContainer>
       </Container>
     </>
   )

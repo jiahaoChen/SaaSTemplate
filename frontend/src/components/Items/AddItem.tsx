@@ -1,21 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { type SubmitHandler, useForm } from "react-hook-form"
-
-import {
-  Button,
-  DialogActionTrigger,
-  DialogTitle,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react"
 import { useState } from "react"
 import { FaPlus } from "react-icons/fa"
+import { Input as AntdInput } from "antd"
+import styled from "styled-components"
 
 import { type ItemCreate, ItemsService } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
+import { Button } from "@/components/ui/button"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -26,6 +20,18 @@ import {
   DialogTrigger,
 } from "../ui/dialog"
 import { Field } from "../ui/field"
+import { VStack, Text } from "../ui/styled"
+
+const StyledDialogTitle = styled.h2`
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: inherit;
+`
+
+const FormContainer = styled.form`
+  width: 100%;
+`
 
 const AddItem = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -67,77 +73,68 @@ const AddItem = () => {
 
   return (
     <DialogRoot
-      size={{ base: "xs", md: "md" }}
-      placement="center"
       open={isOpen}
-      onOpenChange={({ open }) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
     >
-      <DialogTrigger asChild>
-        <Button value="add-item" my={4}>
-          <FaPlus fontSize="16px" />
+      <DialogTrigger onClick={() => setIsOpen(true)}>
+        <Button style={{ margin: '16px 0' }}>
+          <FaPlus fontSize="16px" style={{ marginRight: '8px' }} />
           Add Item
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add Item</DialogTitle>
+            <StyledDialogTitle>Add Item</StyledDialogTitle>
           </DialogHeader>
           <DialogBody>
-            <Text mb={4}>Fill in the details to add a new item.</Text>
+            <Text mb={4}>
+              Fill in the form below to add a new item to the system.
+            </Text>
             <VStack gap={4}>
               <Field
                 required
-                invalid={!!errors.title}
                 errorText={errors.title?.message}
                 label="Title"
               >
-                <Input
+                <AntdInput
                   id="title"
                   {...register("title", {
-                    required: "Title is required.",
+                    required: "Title is required",
                   })}
                   placeholder="Title"
                   type="text"
+                  size="middle"
                 />
               </Field>
 
               <Field
-                invalid={!!errors.description}
                 errorText={errors.description?.message}
                 label="Description"
               >
-                <Input
+                <AntdInput.TextArea
                   id="description"
                   {...register("description")}
                   placeholder="Description"
-                  type="text"
+                  rows={4}
+                  size="middle"
                 />
               </Field>
             </VStack>
           </DialogBody>
-
-          <DialogFooter gap={2}>
-            <DialogActionTrigger asChild>
-              <Button
-                variant="subtle"
-                colorPalette="gray"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-            </DialogActionTrigger>
+          <DialogFooter>
+            <DialogCloseTrigger onClick={() => setIsOpen(false)}>
+              <Button variant="outlined">Cancel</Button>
+            </DialogCloseTrigger>
             <Button
-              variant="solid"
-              type="submit"
-              disabled={!isValid}
+              htmlType="submit"
               loading={isSubmitting}
+              disabled={!isValid}
             >
-              Save
+              Add Item
             </Button>
           </DialogFooter>
-        </form>
-        <DialogCloseTrigger />
+        </FormContainer>
       </DialogContent>
     </DialogRoot>
   )

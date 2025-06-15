@@ -1,19 +1,15 @@
-import {
-  Button,
-  ButtonGroup,
-  DialogActionTrigger,
-  Input,
-  Text,
-  VStack,
-} from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
 import { type SubmitHandler, useForm } from "react-hook-form"
+import { useState } from "react"
 import { FaExchangeAlt } from "react-icons/fa"
+import { Input as AntdInput } from "antd"
+import styled from "styled-components"
 
-import { type ApiError, type ItemPublic, ItemsService } from "@/client"
+import { type ItemPublic, type ItemUpdate, ItemsService } from "@/client"
+import type { ApiError } from "@/client/core/ApiError"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
+import { Button } from "@/components/ui/button"
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -21,18 +17,24 @@ import {
   DialogFooter,
   DialogHeader,
   DialogRoot,
-  DialogTitle,
   DialogTrigger,
 } from "../ui/dialog"
 import { Field } from "../ui/field"
+import { VStack, Text } from "../ui/styled"
+
+const StyledDialogTitle = styled.h2`
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: inherit;
+`
+
+const FormContainer = styled.form`
+  width: 100%;
+`
 
 interface EditItemProps {
   item: ItemPublic
-}
-
-interface ItemUpdateForm {
-  title: string
-  description?: string
 }
 
 const EditItem = ({ item }: EditItemProps) => {
@@ -44,17 +46,14 @@ const EditItem = ({ item }: EditItemProps) => {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<ItemUpdateForm>({
+  } = useForm<ItemUpdate>({
     mode: "onBlur",
     criteriaMode: "all",
-    defaultValues: {
-      ...item,
-      description: item.description ?? undefined,
-    },
+    defaultValues: item,
   })
 
   const mutation = useMutation({
-    mutationFn: (data: ItemUpdateForm) =>
+    mutationFn: (data: ItemUpdate) =>
       ItemsService.updateItem({ id: item.id, requestBody: data }),
     onSuccess: () => {
       showSuccessToast("Item updated successfully.")
@@ -69,80 +68,71 @@ const EditItem = ({ item }: EditItemProps) => {
     },
   })
 
-  const onSubmit: SubmitHandler<ItemUpdateForm> = async (data) => {
+  const onSubmit: SubmitHandler<ItemUpdate> = async (data) => {
     mutation.mutate(data)
   }
 
   return (
     <DialogRoot
-      size={{ base: "xs", md: "md" }}
-      placement="center"
       open={isOpen}
-      onOpenChange={({ open }) => setIsOpen(open)}
+      onOpenChange={setIsOpen}
     >
-      <DialogTrigger asChild>
-        <Button variant="ghost">
-          <FaExchangeAlt fontSize="16px" />
+      <DialogTrigger onClick={() => setIsOpen(true)}>
+        <Button variant="outlined" size="small">
+          <FaExchangeAlt fontSize="16px" style={{ marginRight: '4px' }} />
           Edit Item
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <FormContainer onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
+            <StyledDialogTitle>Edit Item</StyledDialogTitle>
           </DialogHeader>
           <DialogBody>
             <Text mb={4}>Update the item details below.</Text>
             <VStack gap={4}>
               <Field
                 required
-                invalid={!!errors.title}
                 errorText={errors.title?.message}
                 label="Title"
               >
-                <Input
+                <AntdInput
                   id="title"
                   {...register("title", {
                     required: "Title is required",
                   })}
                   placeholder="Title"
                   type="text"
+                  size="middle"
                 />
               </Field>
 
               <Field
-                invalid={!!errors.description}
                 errorText={errors.description?.message}
                 label="Description"
               >
-                <Input
+                <AntdInput.TextArea
                   id="description"
                   {...register("description")}
                   placeholder="Description"
-                  type="text"
+                  rows={4}
+                  size="middle"
                 />
               </Field>
             </VStack>
           </DialogBody>
-
-          <DialogFooter gap={2}>
-            <ButtonGroup>
-              <DialogActionTrigger asChild>
-                <Button
-                  variant="subtle"
-                  colorPalette="gray"
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-              </DialogActionTrigger>
-              <Button variant="solid" type="submit" loading={isSubmitting}>
-                Save
-              </Button>
-            </ButtonGroup>
+          <DialogFooter>
+            <DialogCloseTrigger onClick={() => setIsOpen(false)}>
+              <Button variant="outlined">Cancel</Button>
+            </DialogCloseTrigger>
+            <Button
+              htmlType="submit"
+              loading={isSubmitting}
+            >
+              Update Item
+            </Button>
           </DialogFooter>
-        </form>
-        <DialogCloseTrigger />
+        </FormContainer>
       </DialogContent>
     </DialogRoot>
   )

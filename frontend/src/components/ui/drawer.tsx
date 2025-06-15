@@ -1,11 +1,13 @@
-import { Drawer as ChakraDrawer, Portal } from "@chakra-ui/react"
+import { Drawer as AntdDrawer } from "antd"
+import type { DrawerProps as AntdDrawerProps } from "antd"
 import * as React from "react"
 import { CloseButton } from "./close-button"
 
-interface DrawerContentProps extends ChakraDrawer.ContentProps {
+interface DrawerContentProps extends Omit<AntdDrawerProps, 'children'> {
   portalled?: boolean
   portalRef?: React.RefObject<HTMLElement>
-  offset?: ChakraDrawer.ContentProps["padding"]
+  offset?: string | number
+  children: React.ReactNode
 }
 
 export const DrawerContent = React.forwardRef<
@@ -14,39 +16,83 @@ export const DrawerContent = React.forwardRef<
 >(function DrawerContent(props, ref) {
   const { children, portalled = true, portalRef, offset, ...rest } = props
   return (
-    <Portal disabled={!portalled} container={portalRef}>
-      <ChakraDrawer.Positioner padding={offset}>
-        <ChakraDrawer.Content ref={ref} {...rest} asChild={false}>
-          {children}
-        </ChakraDrawer.Content>
-      </ChakraDrawer.Positioner>
-    </Portal>
+    <AntdDrawer
+      getContainer={portalRef?.current || false}
+      style={{ padding: offset }}
+      {...rest}
+    >
+      <div ref={ref}>{children}</div>
+    </AntdDrawer>
   )
 })
+
+interface DrawerCloseTriggerProps {
+  onClick?: () => void
+  children?: React.ReactNode
+}
 
 export const DrawerCloseTrigger = React.forwardRef<
   HTMLButtonElement,
-  ChakraDrawer.CloseTriggerProps
+  DrawerCloseTriggerProps
 >(function DrawerCloseTrigger(props, ref) {
+  const { onClick, children, ...rest } = props
   return (
-    <ChakraDrawer.CloseTrigger
-      position="absolute"
-      top="2"
-      insetEnd="2"
-      {...props}
-      asChild
+    <div
+      style={{
+        position: "absolute",
+        top: "8px",
+        right: "8px",
+        zIndex: 1000
+      }}
     >
-      <CloseButton size="sm" ref={ref} />
-    </ChakraDrawer.CloseTrigger>
+      <CloseButton size="small" ref={ref} onClick={onClick} {...rest} />
+    </div>
   )
 })
 
-export const DrawerTrigger = ChakraDrawer.Trigger
-export const DrawerRoot = ChakraDrawer.Root
-export const DrawerFooter = ChakraDrawer.Footer
-export const DrawerHeader = ChakraDrawer.Header
-export const DrawerBody = ChakraDrawer.Body
-export const DrawerBackdrop = ChakraDrawer.Backdrop
-export const DrawerDescription = ChakraDrawer.Description
-export const DrawerTitle = ChakraDrawer.Title
-export const DrawerActionTrigger = ChakraDrawer.ActionTrigger
+// For compatibility, we'll create simple wrapper components
+export const DrawerTrigger: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => (
+  <div onClick={onClick}>{children}</div>
+)
+
+export const DrawerRoot: React.FC<{ children: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }> = ({ children }) => (
+  <>{children}</>
+)
+
+export const DrawerFooter: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ padding: '16px 0 0 0', borderTop: '1px solid #f0f0f0' }}>
+    {children}
+  </div>
+)
+
+export const DrawerHeader: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ padding: '0 0 16px 0', borderBottom: '1px solid #f0f0f0' }}>
+    {children}
+  </div>
+)
+
+export const DrawerBody: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ padding: '16px 0' }}>
+    {children}
+  </div>
+)
+
+export const DrawerBackdrop: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+  <>{children}</>
+)
+
+export const DrawerDescription: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={{ color: '#666', fontSize: '14px' }}>
+    {children}
+  </div>
+)
+
+export const DrawerTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
+    {children}
+  </h3>
+)
+
+export const DrawerActionTrigger: React.FC<{ children: React.ReactNode; onClick?: () => void }> = ({ children, onClick }) => (
+  <div onClick={onClick}>{children}</div>
+)

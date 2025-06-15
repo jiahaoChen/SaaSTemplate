@@ -1,9 +1,6 @@
 import type {
   AnalyticsEvent,
   GAEventParams,
-  AuthEventParams,
-  NavigationEventParams,
-  SettingsEventParams,
   AnalyticsConfig,
 } from '../types/analytics';
 

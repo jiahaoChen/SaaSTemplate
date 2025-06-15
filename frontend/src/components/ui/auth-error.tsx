@@ -1,6 +1,32 @@
-import { Flex, Text } from "@chakra-ui/react"
+import { Typography } from "antd"
+import styled from 'styled-components'
 import { useColorModeValue } from "./color-mode"
 import { FiAlertCircle } from "react-icons/fi"
+
+const { Text } = Typography
+
+interface ErrorTheme {
+  bg: string
+  borderColor: string
+  textColor: string
+}
+
+const ErrorContainer = styled.div<{ theme: ErrorTheme }>`
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid;
+  background-color: ${props => props.theme.bg};
+  border-color: ${props => props.theme.borderColor};
+  color: ${props => props.theme.textColor};
+`
+
+const ErrorIcon = styled(FiAlertCircle)`
+  margin-right: 8px;
+  font-size: 16px;
+`
 
 interface AuthErrorProps {
   error: any;
@@ -9,9 +35,9 @@ interface AuthErrorProps {
 }
 
 export function AuthError({ error, message, t }: AuthErrorProps) {
-  const bgColor = useColorModeValue("red.50", "rgba(254, 178, 178, 0.16)")
-  const textColor = useColorModeValue("red.600", "red.300")
-  const borderColor = useColorModeValue("red.200", "red.500")
+  const bgColor = useColorModeValue("rgba(255, 240, 240, 0.8)", "rgba(254, 178, 178, 0.16)")
+  const textColor = useColorModeValue("#d32f2f", "#f48fb1")
+  const borderColor = useColorModeValue("#ffcdd2", "#e57373")
   
   // If there's no error, don't render anything
   if (!error) return null
@@ -51,21 +77,18 @@ export function AuthError({ error, message, t }: AuthErrorProps) {
     return t ? t('auth.generalError') : "An error occurred. Please try again"
   }
   
+  const themeProps = {
+    bg: bgColor,
+    textColor: textColor,
+    borderColor: borderColor
+  }
+  
   return (
-    <Flex 
-      mt={4} 
-      p={3}
-      borderRadius="md"
-      bg={bgColor}
-      borderWidth="1px"
-      borderColor={borderColor}
-      color={textColor}
-      alignItems="center"
-    >
-      <FiAlertCircle size="16px" style={{ marginRight: '8px' }} />
-      <Text fontWeight="medium" fontSize="sm">
+    <ErrorContainer theme={themeProps}>
+      <ErrorIcon />
+      <Text style={{ fontWeight: 500, fontSize: '14px', color: textColor }}>
         {getErrorMessage()}
       </Text>
-    </Flex>
+    </ErrorContainer>
   )
 } 

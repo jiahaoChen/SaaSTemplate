@@ -1,12 +1,27 @@
-import type {
-  SkeletonProps as ChakraSkeletonProps,
-  CircleProps,
-} from "@chakra-ui/react"
-import { Skeleton as ChakraSkeleton, Circle, Stack } from "@chakra-ui/react"
+import { Skeleton as AntdSkeleton } from "antd"
+import type { SkeletonProps as AntdSkeletonProps } from "antd"
 import * as React from "react"
+import styled from 'styled-components'
 
-export interface SkeletonCircleProps extends ChakraSkeletonProps {
-  size?: CircleProps["size"]
+const SkeletonStack = styled.div<{ gap?: string | number }>`
+  display: flex;
+  flex-direction: column;
+  gap: ${props => typeof props.gap === 'number' ? `${props.gap}px` : props.gap || '8px'};
+  width: 100%;
+`
+
+const CircleSkeletonWrapper = styled.div<{ size?: string | number }>`
+  width: ${props => typeof props.size === 'number' ? `${props.size}px` : props.size || '40px'};
+  height: ${props => typeof props.size === 'number' ? `${props.size}px` : props.size || '40px'};
+  
+  .ant-skeleton-avatar {
+    width: 100% !important;
+    height: 100% !important;
+  }
+`
+
+export interface SkeletonCircleProps extends Omit<AntdSkeletonProps, 'avatar'> {
+  size?: string | number
 }
 
 export const SkeletonCircle = React.forwardRef<
@@ -14,34 +29,40 @@ export const SkeletonCircle = React.forwardRef<
   SkeletonCircleProps
 >(function SkeletonCircle(props, ref) {
   const { size, ...rest } = props
+  
   return (
-    <Circle size={size} asChild ref={ref}>
-      <ChakraSkeleton {...rest} />
-    </Circle>
+    <CircleSkeletonWrapper ref={ref} size={size}>
+      <AntdSkeleton.Avatar active shape="circle" {...rest} />
+    </CircleSkeletonWrapper>
   )
 })
 
-export interface SkeletonTextProps extends ChakraSkeletonProps {
+export interface SkeletonTextProps extends AntdSkeletonProps {
   noOfLines?: number
+  gap?: string | number
 }
 
 export const SkeletonText = React.forwardRef<HTMLDivElement, SkeletonTextProps>(
   function SkeletonText(props, ref) {
     const { noOfLines = 3, gap, ...rest } = props
+    
     return (
-      <Stack gap={gap} width="full" ref={ref}>
+      <SkeletonStack ref={ref} gap={gap}>
         {Array.from({ length: noOfLines }).map((_, index) => (
-          <ChakraSkeleton
-            height="4"
+          <AntdSkeleton.Button
             key={index}
-            {...props}
-            _last={{ maxW: "80%" }}
+            active
+            style={{
+              height: '16px',
+              width: index === noOfLines - 1 ? '80%' : '100%'
+            }}
             {...rest}
           />
         ))}
-      </Stack>
+      </SkeletonStack>
     )
   },
 )
 
-export const Skeleton = ChakraSkeleton
+// Export the base Ant Design Skeleton as well
+export const Skeleton = AntdSkeleton

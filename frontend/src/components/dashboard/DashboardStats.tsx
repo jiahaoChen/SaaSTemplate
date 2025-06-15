@@ -1,10 +1,170 @@
 import React from "react";
-import { Box, Grid, Flex, Text, Icon, Spinner, Center } from "@chakra-ui/react";
+import styled, { useTheme } from 'styled-components';
+import { Typography, Spin } from "antd";
 import { FaSitemap, FaDatabase, FaChartLine, FaArrowUp, FaExclamationTriangle } from "react-icons/fa";
-import { colors, shadows } from "../../theme/tokens";
-import { useColorModeValue } from "@/components/ui/color-mode";
 import { useItemStats } from "../../hooks/useItemStats";
 import useLanguage from "@/hooks/useLanguage";
+
+const { Text } = Typography;
+
+const StatsContainer = styled.div`
+  margin-bottom: 32px;
+`;
+
+const StatsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  
+  @media (min-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+
+const StatCardContainer = styled.div<{ $bg: string; $border: string }>`
+  background: ${props => props.$bg};
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid ${props => props.$border};
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+`;
+
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const CardTitle = styled(Text)<{ $color: string }>`
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: ${props => props.$color};
+`;
+
+const CardDescription = styled(Text)<{ $color: string }>`
+  font-size: 12px;
+  color: ${props => props.$color};
+`;
+
+const IconContainer = styled.div<{ $bg: string; $color: string }>`
+  background: ${props => props.$bg};
+  color: ${props => props.$color};
+  padding: 8px;
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ValueContainer = styled.div`
+  display: flex;
+  align-items: baseline;
+`;
+
+const Value = styled(Text)<{ $color: string }>`
+  font-size: 24px;
+  font-weight: 700;
+  margin-right: 4px;
+  color: ${props => props.$color};
+`;
+
+const Unit = styled(Text)<{ $color: string }>`
+  font-size: 14px;
+  color: ${props => props.$color};
+  font-weight: 500;
+`;
+
+const TrendContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+`;
+
+const TrendIcon = styled.div<{ $color: string; $isUp: boolean }>`
+  color: ${props => props.$color};
+  margin-right: 4px;
+  transform: ${props => props.$isUp ? 'rotate(0deg)' : 'rotate(180deg)'};
+`;
+
+const TrendText = styled(Text)<{ $color: string }>`
+  color: ${props => props.$color};
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+const ProgressContainer = styled.div`
+  margin-top: 12px;
+`;
+
+const ProgressHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+`;
+
+const ProgressLabel = styled(Text)<{ $color: string }>`
+  font-size: 12px;
+  color: ${props => props.$color};
+  font-weight: 500;
+`;
+
+const ProgressBar = styled.div<{ $bg: string }>`
+  background: ${props => props.$bg};
+  border-radius: 4px;
+  height: 4px;
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div<{ $bg: string; $width: number }>`
+  background: ${props => props.$bg};
+  height: 100%;
+  border-radius: 4px;
+  width: ${props => props.$width}%;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+`;
+
+const ErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+`;
+
+const ErrorIcon = styled.div`
+  font-size: 40px;
+  color: #ff4d4f;
+  margin-bottom: 16px;
+`;
+
+const ErrorText = styled(Text)`
+  color: #ff4d4f;
+`;
 
 interface StatCardProps {
   title: string;
@@ -31,103 +191,80 @@ const StatCard: React.FC<StatCardProps> = ({
   description,
   value,
   unit,
-  icon,
+  icon: Icon,
   iconBg,
   iconColor,
   trend,
   progress,
 }) => {
-  const cardBg = useColorModeValue("white", "gray.800");
-  const cardBorder = useColorModeValue("gray.100", "gray.700");
-  const titleColor = useColorModeValue("gray.800", "white");
-  const descriptionColor = useColorModeValue("gray.500", "gray.400");
-  const valueColor = useColorModeValue("gray.800", "white");
-  const progressBg = useColorModeValue("gray.100", "gray.600");
+  const theme = useTheme() as any;
+  const isDark = theme.algorithm === theme.darkAlgorithm;
   const { t } = useLanguage();
+  
+  const cardBg = isDark ? '#1f1f1f' : '#ffffff';
+  const cardBorder = isDark ? '#303030' : '#d9d9d9';
+  const titleColor = isDark ? '#ffffff' : '#262626';
+  const descriptionColor = isDark ? '#a6a6a6' : '#8c8c8c';
+  const valueColor = isDark ? '#ffffff' : '#262626';
+  const progressBg = isDark ? '#404040' : '#f0f0f0';
 
   return (
-    <Box
-      bg={cardBg}
-      borderRadius="lg"
-      p={5}
-      boxShadow={shadows.sm}
-      borderWidth="1px"
-      borderColor={cardBorder}
-      transition="transform 0.3s, box-shadow 0.3s"
-      _hover={{
-        transform: "translateY(-5px)",
-        boxShadow: "md",
-      }}
-    >
-      <Flex mb={5} justify="space-between" align="start">
-        <Flex direction="column">
-          <Text fontWeight="600" fontSize="sm" mb={1} color={titleColor}>
+    <StatCardContainer $bg={cardBg} $border={cardBorder}>
+      <CardHeader>
+        <CardContent>
+          <CardTitle $color={titleColor}>
             {title}
-          </Text>
-          <Text fontSize="xs" color={descriptionColor}>
+          </CardTitle>
+          <CardDescription $color={descriptionColor}>
             {description}
-          </Text>
-        </Flex>
-        <Flex
-          bg={iconBg}
-          color={iconColor}
-          p={2}
-          borderRadius="md"
-          boxSize="40px"
-          align="center"
-          justify="center"
-        >
-          <Icon as={icon} boxSize={5} />
-        </Flex>
-      </Flex>
+          </CardDescription>
+        </CardContent>
+        <IconContainer $bg={iconBg} $color={iconColor}>
+          <Icon size={20} />
+        </IconContainer>
+      </CardHeader>
 
-      <Flex align="baseline">
-        <Text fontSize="2xl" fontWeight="700" mr={1} color={valueColor}>
+      <ValueContainer>
+        <Value $color={valueColor}>
           {value}
-        </Text>
+        </Value>
         {unit && (
-          <Text fontSize="sm" color={descriptionColor} fontWeight="medium">
+          <Unit $color={descriptionColor}>
             {unit}
-          </Text>
+          </Unit>
         )}
-      </Flex>
+      </ValueContainer>
 
       {trend && (
-        <Flex mt={2} align="center">
-          <Icon
-            as={FaArrowUp}
-            color={trend.color}
-            boxSize={3}
-            transform={trend.isUp ? "rotate(0deg)" : "rotate(180deg)"}
-            mr={1}
-          />
-          <Text color={trend.color} fontSize="xs" fontWeight="medium">
+        <TrendContainer>
+          <TrendIcon $color={trend.color} $isUp={trend.isUp}>
+            <FaArrowUp size={12} />
+          </TrendIcon>
+          <TrendText $color={trend.color}>
             {trend.value}
-          </Text>
-        </Flex>
+          </TrendText>
+        </TrendContainer>
       )}
 
       {progress && (
-        <Box mt={3}>
-          <Flex justify="space-between" mb={1}>
-            <Text fontSize="xs" color={descriptionColor} fontWeight="medium">
+        <ProgressContainer>
+          <ProgressHeader>
+            <ProgressLabel $color={descriptionColor}>
               {t("dashboard.usage", "使用量")}
-            </Text>
-            <Text fontSize="xs" color={descriptionColor} fontWeight="medium">
+            </ProgressLabel>
+            <ProgressLabel $color={descriptionColor}>
               {progress.value}/{progress.max}
-            </Text>
-          </Flex>
-          <Box bg={progressBg} borderRadius="full" h="4px" overflow="hidden">
-            <Box
-              bg={progress.color}
-              h="100%"
-              borderRadius="full"
-              w={`${(progress.value / progress.max) * 100}%`}
+            </ProgressLabel>
+          </ProgressHeader>
+          <ProgressBar $bg={progressBg}>
+            <ProgressFill
+              $bg={progress.color}
+              $width={(progress.value / progress.max) * 100}
             />
-          </Box>
-        </Box>
+          </ProgressBar>
+        </ProgressContainer>
       )}
-    </Box>
+    </StatCardContainer>
   );
 };
 
@@ -137,43 +274,37 @@ const DashboardStats: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Center py={10}>
-        <Spinner size="xl" color={colors.primary[500]} />
-      </Center>
+      <LoadingContainer>
+        <Spin size="large" />
+      </LoadingContainer>
     );
   }
 
   if (error || !stats) {
     return (
-      <Flex 
-        direction="column" 
-        align="center" 
-        justify="center" 
-        py={10}
-      >
-        <Icon as={FaExclamationTriangle} color="red.500" boxSize={10} mb={4} />
-        <Text color="red.500">{t("dashboard.statsLoadFailed", "無法載入統計資料")}</Text>
-      </Flex>
+      <ErrorContainer>
+        <ErrorIcon>
+          <FaExclamationTriangle />
+        </ErrorIcon>
+        <ErrorText>{t("dashboard.statsLoadFailed", "無法載入統計資料")}</ErrorText>
+      </ErrorContainer>
     );
   }
 
   return (
-    <Box mb={8}>
-      <Grid
-        templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
-        gap={5}
-      >
+    <StatsContainer>
+      <StatsGrid>
         <StatCard
           title={t("dashboard.totalItems", "Total Items")}
           description={t("dashboard.allCreatedItems", "All created items")}
           value={stats.totalItems}
           icon={FaSitemap}
-          iconBg={colors.primary[50]}
-          iconColor={colors.primary[500]}
+          iconBg="rgba(22, 119, 255, 0.1)"
+          iconColor="#1677ff"
           trend={{
             isUp: true,
             value: `${t("dashboard.total", "Total")} ${stats.totalItems} ${t("dashboard.itemsUnit", "items")}`,
-            color: colors.success,
+            color: "#52c41a",
           }}
         />
 
@@ -183,12 +314,12 @@ const DashboardStats: React.FC = () => {
           value={stats.totalItems}
           unit={`/${stats.maxItems}`}
           icon={FaDatabase}
-          iconBg="rgba(246, 173, 85, 0.2)"
-          iconColor={colors.warning}
+          iconBg="rgba(250, 173, 20, 0.2)"
+          iconColor="#faad14"
           progress={{
             value: stats.totalItems,
             max: stats.maxItems,
-            color: colors.warning,
+            color: "#faad14",
           }}
         />
 
@@ -197,30 +328,16 @@ const DashboardStats: React.FC = () => {
           description={`${t("dashboard.thisMonthGenerated", "Generated this month")} ${stats.currentMonthItems} ${t("dashboard.itemsUnit", "items")}`}
           value={stats.currentMonthItems}
           icon={FaChartLine}
-          iconBg="rgba(72, 187, 120, 0.2)"
-          iconColor={colors.success}
+          iconBg="rgba(82, 196, 26, 0.2)"
+          iconColor="#52c41a"
           progress={{
             value: stats.currentMonthItems,
             max: 50,
-            color: colors.success,
+            color: "#52c41a",
           }}
         />
-
-        {/* <StatCard
-          title={t("dashboard.shared", "已分享")}
-          description={t("dashboard.sharedMindmapsCount", "已分享的思維導圖數量")}
-          value={8}
-          icon={FaShareAlt}
-          iconBg="rgba(255, 108, 135, 0.2)"
-          iconColor={colors.secondary[400]}
-          trend={{
-            isUp: true,
-            value: t("dashboard.increasedFromLastMonth", "較上個月增加 {{count}} 個", { count: 2 }),
-            color: colors.secondary[400],
-          }}
-        /> */}
-      </Grid>
-    </Box>
+      </StatsGrid>
+    </StatsContainer>
   );
 };
 

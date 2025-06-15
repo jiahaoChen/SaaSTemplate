@@ -1,12 +1,4 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Heading,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react"
+import { Typography } from "antd"
 import {
   Link as RouterLink,
   createFileRoute,
@@ -17,6 +9,7 @@ import { type SubmitHandler, useForm } from "react-hook-form"
 import { FiLock, FiMail } from "react-icons/fi"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
+import styled from "styled-components"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { Button } from "@/components/ui/button"
@@ -30,6 +23,99 @@ import { LanguageSwitcher } from "@/components/ui/language-switcher"
 import { AuthError } from "@/components/ui/auth-error"
 import useAnalytics from "@/hooks/useAnalytics"
 // import { LoginService } from "@/client"
+
+const PageContainer = styled.div<{ bg?: string }>`
+  min-height: 100vh;
+  padding: 48px 16px;
+  background: ${props => props.bg || '#f5f5f5'};
+`
+
+const FormContainer = styled.form<{ 
+  maxW?: string
+  bg?: string
+  borderColor?: string
+}>`
+  max-width: ${props => props.maxW || '450px'};
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 40px;
+  border-radius: 10px;
+  background: ${props => props.bg || 'white'};
+  border: 1px solid ${props => props.borderColor || '#e0e0e0'};
+  margin: 0 auto;
+`
+
+const FlexContainer = styled.div<{
+  direction?: string
+  justify?: string
+  align?: string
+  mb?: number
+  gap?: number
+}>`
+  display: flex;
+  flex-direction: ${props => props.direction || 'row'};
+  justify-content: ${props => props.justify || 'flex-start'};
+  align-items: ${props => props.align || 'stretch'};
+  margin-bottom: ${props => props.mb ? `${props.mb * 4}px` : '0'};
+  gap: ${props => props.gap ? `${props.gap * 4}px` : '0'};
+`
+
+const LogoContainer = styled.div`
+  margin-right: 8px;
+`
+
+const StyledHeading = styled(Typography.Title)<{ color?: string; mb?: number }>`
+  color: ${props => props.color} !important;
+  margin-bottom: ${props => props.mb ? `${props.mb * 4}px` : '0'} !important;
+`
+
+const StyledText = styled(Typography.Text)<{ 
+  color?: string
+  fontWeight?: string | number
+  mb?: number
+}>`
+  color: ${props => props.color} !important;
+  font-weight: ${props => props.fontWeight || 'normal'} !important;
+  margin-bottom: ${props => props.mb ? `${props.mb * 4}px` : '0'};
+  display: block;
+`
+
+const StackContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`
+
+const FieldContainer = styled.div``
+
+const PasswordFieldContainer = styled.div``
+
+const StyledInput = styled.input<{
+  borderRadius?: string
+  borderColor?: string
+  color?: string
+}>`
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid ${props => props.borderColor || '#d9d9d9'};
+  border-radius: ${props => props.borderRadius || '6px'};
+  font-size: 14px;
+  color: ${props => props.color || 'inherit'};
+  transition: all 0.3s;
+  
+  &:focus {
+    border-color: #1677ff;
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: ${props => props.color ? `${props.color}66` : '#999'};
+  }
+`
+
+const CenteredContainer = styled.div`
+  text-align: center;
+`
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -89,7 +175,7 @@ function Login() {
 
   // Colors with dark mode support
   const primaryColor = "#7856ff"
-  const primaryDarkColor = "#6040e0"
+  // const primaryDarkColor = "#6040e0"
   
   // Dynamic colors for dark mode
   const bgColor = useColorModeValue("white", "gray.800")
@@ -98,27 +184,22 @@ function Login() {
   const borderColor = useColorModeValue("gray.200", "gray.700")
   
   return (
-    <Box minH="100vh" py={12} px={4} bg={useColorModeValue("gray.50", "gray.900")}>
-      <Container 
-        as="form" 
+    <PageContainer bg={useColorModeValue("gray.50", "gray.900")}>
+      <FormContainer 
         onSubmit={handleSubmit(onSubmit)}
         maxW="450px"
-        boxShadow="md"
-        p={10}
-        borderRadius="10px"
         bg={bgColor}
         borderColor={borderColor}
-        borderWidth="1px"
       >
-        <Flex justifyContent="flex-end" mb={6} gap={2}>
+        <FlexContainer justify="flex-end" mb={6} gap={2}>
           <ColorModeButton />
           <LanguageSwitcher />
-        </Flex>
+        </FlexContainer>
         
-        <Flex direction="column" align="center" mb={8}>
+        <FlexContainer direction="column" align="center" mb={8}>
           <RouterLink to="/" style={{ textDecoration: 'none' }}>
-            <Flex align="center" mb={6}>
-              <Box mr={2}>
+            <FlexContainer align="center" mb={6}>
+              <LogoContainer>
                 <img 
                   src="/assets/images/logo1.png" 
                   alt="SaaS Template Logo"
@@ -126,31 +207,30 @@ function Login() {
                   height="32"
                   style={{ display: 'inline-block' }}
                 />
-              </Box>
-              <Heading as="h2" fontSize="1.5rem" fontWeight="700" color={textColor}>
+              </LogoContainer>
+              <StyledHeading level={2} color={textColor}>
                 SaaS Template
-              </Heading>
-            </Flex>
+              </StyledHeading>
+            </FlexContainer>
           </RouterLink>
-          <Heading as="h1" fontSize="1.8rem" mb={2} color={textColor}>
+          <StyledHeading level={1} color={textColor} mb={2}>
             {t('auth.login')}
-          </Heading>
-          <Text color={mutedTextColor}>
+          </StyledHeading>
+          <StyledText color={mutedTextColor}>
             {t('auth.welcomeBack')}
-          </Text>
-        </Flex>
+          </StyledText>
+        </FlexContainer>
 
-        <Stack gap={5}>
-          <Box>
-            <Text fontWeight="500" mb={2} color={textColor}>
+        <StackContainer>
+          <FieldContainer>
+            <StyledText fontWeight="500" mb={2} color={textColor}>
               {t('auth.email')}
-            </Text>
+            </StyledText>
             <Field
-              invalid={!!errors.username}
               errorText={errors.username?.message || !!apiError || !!authError}
             >
-              <InputGroup w="100%" startElement={<FiMail color={useColorModeValue("gray.500", "gray.400")} />}>
-                <Input
+              <InputGroup startElement={<FiMail color={useColorModeValue("gray.500", "gray.400")} />}>
+                <StyledInput
                   id="username"
                   {...register("username", {
                     required: t('validation.emailRequired'),
@@ -158,122 +238,66 @@ function Login() {
                   })}
                   placeholder={t('auth.email')}
                   type="email"
-                  size="md"
                   borderRadius="10px"
                   borderColor={borderColor}
                   color={textColor}
-                  _placeholder={{ color: mutedTextColor }}
                 />
               </InputGroup>
             </Field>
-          </Box>
+          </FieldContainer>
 
-          <Box>
-            <Flex justify="space-between" mb={2}>
-              <Text fontWeight="500" color={textColor}>{t('auth.password')}</Text>
+          <PasswordFieldContainer>
+            <FlexContainer justify="space-between" mb={2}>
+              <StyledText fontWeight="500" color={textColor}>{t('auth.password')}</StyledText>
               <RouterLink to="/recover-password" style={{ color: primaryColor, textDecoration: 'none', fontSize: '0.9rem' }}>
                 {t('auth.forgotPassword')}
               </RouterLink>
-            </Flex>
+            </FlexContainer>
             <PasswordInput
               type="password"
               startElement={<FiLock color={useColorModeValue("gray.500", "gray.400")} />}
               {...register("password", passwordRules(t('validation.passwordRequired')))}
               placeholder={t('auth.password')}
               errors={errors}
-              borderRadius="10px"
-              borderColor={borderColor}
-              color={textColor}
-              _placeholder={{ color: mutedTextColor }}
             />
-          </Box>
+          </PasswordFieldContainer>
 
           {/* <Checkbox color={primaryColor}>
             {t('auth.rememberMe')}
           </Checkbox> */}
 
           <Button 
-            variant="solid" 
-            type="submit" 
+            htmlType="submit" 
             loading={isSubmitting} 
-            size="md"
-            bg={primaryColor}
-            color="white"
-            _hover={{ bg: primaryDarkColor }}
-            borderRadius="10px"
-            h="45px"
-            fontSize="md"
-            w="100%"
+            size="large"
+            style={{
+              background: primaryColor,
+              borderColor: primaryColor,
+              color: 'white',
+              borderRadius: '10px',
+              height: '45px',
+              fontSize: '14px',
+              width: '100%'
+            }}
           >
             {t('auth.login')}
           </Button>
-        </Stack>
+        </StackContainer>
 
         <AuthError error={apiError || authError} t={t} />
 
-        {/* <Box textAlign="center" my={6}>
-          <Text color={mutedTextColor} mb={4}>
-            {t('auth.loginWith')}
-          </Text>
-          <Flex justify="center" gap={4}>
-            <Flex 
-              align="center" 
-              justify="center" 
-              w="50px" 
-              h="50px" 
-              borderRadius="10px" 
-              border="1px" 
-              borderColor={borderColor}
-              cursor="pointer"
-              color="#4267B2"
-              transition="all 0.3s ease"
-              _hover={{ bg: hoverBg }}
-            >
-              <FaFacebookF size="1.3rem" />
-            </Flex>
-            <Flex 
-              align="center" 
-              justify="center" 
-              w="50px" 
-              h="50px" 
-              borderRadius="10px" 
-              border="1px" 
-              borderColor={borderColor}
-              cursor="pointer"
-              color="#DB4437"
-              transition="all 0.3s ease"
-              _hover={{ bg: hoverBg }}
-            >
-              <FaGoogle size="1.3rem" />
-            </Flex>
-            <Flex 
-              align="center" 
-              justify="center" 
-              w="50px" 
-              h="50px" 
-              borderRadius="10px" 
-              border="1px" 
-              borderColor={borderColor}
-              cursor="pointer"
-              color="#0072b1"
-              transition="all 0.3s ease"
-              _hover={{ bg: hoverBg }}
-            >
-              <FaLinkedinIn size="1.3rem" />
-            </Flex>
-          </Flex>
-        </Box> */}
+        {/* Social login buttons removed for simplicity */}
 
-        <Box textAlign="center">
-          <Text color={mutedTextColor}>
+        <CenteredContainer>
+          <StyledText color={mutedTextColor}>
             {t('auth.doNotHaveAccount')}{" "}
             <RouterLink to="/signup" style={{ color: primaryColor, textDecoration: 'none', fontWeight: 'bold' }}>
               {t('auth.signup')}
             </RouterLink>
-          </Text>
-        </Box>
-      </Container>
-    </Box>
+          </StyledText>
+        </CenteredContainer>
+      </FormContainer>
+    </PageContainer>
   )
 }
 

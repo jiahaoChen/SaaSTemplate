@@ -12,8 +12,8 @@ export function useItemStats(): {
   isLoading: boolean;
   error: Error | null;
 } {
-  const currentDate = new Date();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  // const currentDate = new Date();
+  // const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   
   const result = useQuery({
     queryKey: ["itemStats"],

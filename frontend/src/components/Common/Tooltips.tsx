@@ -1,46 +1,39 @@
-import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react"
+import { Tooltip as AntdTooltip } from "antd"
+import type { TooltipProps as AntdTooltipProps } from "antd"
 import * as React from "react"
 
-export interface TooltipProps extends ChakraTooltip.RootProps {
+export interface TooltipProps extends Omit<AntdTooltipProps, 'title'> {
   showArrow?: boolean
   portalled?: boolean
   portalRef?: React.RefObject<HTMLElement>
   content: React.ReactNode
-  contentProps?: ChakraTooltip.ContentProps
   disabled?: boolean
+  children: React.ReactNode
 }
 
 export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   function Tooltip(props, ref) {
     const {
-      showArrow,
+      showArrow = true,
       children,
       disabled,
       portalled = true,
       content,
-      contentProps,
       portalRef,
       ...rest
     } = props
 
-    if (disabled) return children
+    if (disabled) return <>{children}</>
 
     return (
-      <ChakraTooltip.Root {...rest}>
-        <ChakraTooltip.Trigger asChild>{children}</ChakraTooltip.Trigger>
-        <Portal disabled={!portalled} container={portalRef}>
-          <ChakraTooltip.Positioner>
-            <ChakraTooltip.Content ref={ref} {...contentProps}>
-              {showArrow && (
-                <ChakraTooltip.Arrow>
-                  <ChakraTooltip.ArrowTip />
-                </ChakraTooltip.Arrow>
-              )}
-              {content}
-            </ChakraTooltip.Content>
-          </ChakraTooltip.Positioner>
-        </Portal>
-      </ChakraTooltip.Root>
+      <AntdTooltip
+        title={content}
+        arrow={showArrow}
+        getPopupContainer={portalRef?.current ? () => portalRef.current! : undefined}
+        {...rest}
+      >
+        <div ref={ref}>{children}</div>
+      </AntdTooltip>
     )
   },
 )

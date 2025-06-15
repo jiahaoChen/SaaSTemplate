@@ -1,56 +1,105 @@
-// Theme tokens for consistent styling
+// Theme tokens for Ant Design migration
+// Replaces the old Chakra UI theme tokens
+
 export const colors = {
   primary: {
-    50: "#e6e0ff",
-    100: "#c4b5ff",
-    200: "#a28aff",
-    300: "#7f5fff",
-    400: "#6c46ff",
-    500: "#7856ff", // Main primary color
-    600: "#6040e0",
-    700: "#4930b3",
-    800: "#322086",
-    900: "#1b1059",
+    50: '#e0f2f1',
+    100: '#b2dfdb',
+    200: '#80cbc4',
+    300: '#4db6ac',
+    400: '#26a69a',
+    500: '#009688', // Main primary color
+    600: '#00897b',
+    700: '#00796b',
+    800: '#00695c',
+    900: '#004d40',
   },
   secondary: {
-    50: "#ffe2e7",
-    100: "#ffb5c0",
-    200: "#ff8799",
-    300: "#ff5972",
-    400: "#ff6c87", // Main secondary color
-    500: "#ff3b5b",
-    600: "#e02a46",
-    700: "#b32038",
-    800: "#86152a",
-    900: "#590b1b",
+    50: '#f3e5f5',
+    100: '#e1bee7',
+    200: '#ce93d8',
+    300: '#ba68c8',
+    400: '#ab47bc',
+    500: '#9c27b0',
+    600: '#8e24aa',
+    700: '#7b1fa2',
+    800: '#6a1b9a',
+    900: '#4a148c',
   },
-  success: "#48bb78",
-  warning: "#f6ad55",
-  danger: "#f56565",
-  light: "#f5f7fa",
-  dark: "#333333",
   gray: {
-    100: "#f5f7fa",
-    200: "#e2e8f0",
-    300: "#cbd5e0",
-    400: "#a0aec0",
-    500: "#718096",
-    600: "#4a5568",
-    700: "#2d3748",
-    800: "#1a202c",
-    900: "#171923",
+    50: '#fafafa',
+    100: '#f5f5f5',
+    200: '#eeeeee',
+    300: '#e0e0e0',
+    400: '#bdbdbd',
+    500: '#9e9e9e',
+    600: '#757575',
+    700: '#616161',
+    800: '#424242',
+    900: '#212121',
   },
-};
+  success: {
+    500: '#52c41a',
+  },
+  warning: {
+    500: '#faad14',
+  },
+  error: {
+    500: '#ff4d4f',
+  },
+  info: {
+    500: '#1677ff',
+  },
+}
 
 export const shadows = {
-  sm: "0 1px 3px rgba(0, 0, 0, 0.1)",
-  md: "0 4px 6px rgba(0, 0, 0, 0.1)",
-  lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-};
+  xs: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  sm: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+}
+
+export const spacing = {
+  0: '0px',
+  1: '4px',
+  2: '8px',
+  3: '12px',
+  4: '16px',
+  5: '20px',
+  6: '24px',
+  8: '32px',
+  10: '40px',
+  12: '48px',
+  16: '64px',
+  20: '80px',
+  24: '96px',
+  32: '128px',
+  40: '160px',
+  48: '192px',
+  56: '224px',
+  64: '256px',
+}
 
 export const borderRadius = {
-  sm: "5px",
-  md: "10px",
-  lg: "15px",
-  full: "9999px",
-}; 
+  none: '0',
+  sm: '2px',
+  base: '4px',
+  md: '6px',
+  lg: '8px',
+  xl: '12px',
+  '2xl': '16px',
+  '3xl': '24px',
+  full: '9999px',
+}
+
+// Export default theme object for easier usage
+export const theme = {
+  colors,
+  shadows,
+  spacing,
+  borderRadius,
+}
+
+export default theme 

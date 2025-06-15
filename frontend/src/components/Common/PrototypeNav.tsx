@@ -1,5 +1,6 @@
-import { Box, Button, Flex, Heading, HStack } from "@chakra-ui/react"
 import React from "react"
+import { Box, Flex, Heading } from "../ui/styled"
+import { Button } from "../ui/button"
 
 interface PrototypeNavProps {
   currentPage: string
@@ -26,23 +27,22 @@ const PrototypeNav: React.FC<PrototypeNavProps> = ({
       right="0"
       bg="white"
       boxShadow="md"
-      zIndex="1000"
+      zIndex={1000}
       p={4}
     >
       <Flex justify="space-between" align="center" maxW="1200px" mx="auto">
         <Heading size="md">YouTube MindMap 原型</Heading>
-        <HStack gap={4}>
+        <Flex gap={4}>
           {pages.map((page) => (
             <Button
               key={page.id}
-              colorScheme={currentPage === page.id ? "purple" : "gray"}
-              variant={currentPage === page.id ? "solid" : "outline"}
+              type={currentPage === page.id ? "primary" : "default"}
               onClick={() => onChangePage(page.id)}
             >
               {page.label}
             </Button>
           ))}
-        </HStack>
+        </Flex>
       </Flex>
     </Box>
   )

@@ -1,89 +1,96 @@
 "use client"
 
-import { AbsoluteCenter, Menu as ChakraMenu, Portal } from "@chakra-ui/react"
+import { Menu as AntdMenu, Divider } from "antd"
 import * as React from "react"
 import { LuCheck, LuChevronRight } from "react-icons/lu"
+import styled from 'styled-components'
 
-interface MenuContentProps extends ChakraMenu.ContentProps {
+const MenuContainer = styled.div`
+  .ant-dropdown-menu {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+  }
+`;
+
+const MenuItemWithIcon = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+interface MenuContentProps extends React.HTMLAttributes<HTMLDivElement> {
   portalled?: boolean
   portalRef?: React.RefObject<HTMLElement>
+  children?: React.ReactNode
 }
 
 export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
   function MenuContent(props, ref) {
-    const { portalled = true, portalRef, ...rest } = props
+    const { portalled = true, portalRef, children, ...rest } = props
+    
+    // For Ant Design, we'll wrap the content in a container
     return (
-      <Portal disabled={!portalled} container={portalRef}>
-        <ChakraMenu.Positioner>
-          <ChakraMenu.Content ref={ref} {...rest} />
-        </ChakraMenu.Positioner>
-      </Portal>
+      <MenuContainer ref={ref} {...rest}>
+        {children}
+      </MenuContainer>
     )
   },
 )
 
 export const MenuArrow = React.forwardRef<
   HTMLDivElement,
-  ChakraMenu.ArrowProps
->(function MenuArrow(props, ref) {
-  return (
-    <ChakraMenu.Arrow ref={ref} {...props}>
-      <ChakraMenu.ArrowTip />
-    </ChakraMenu.Arrow>
-  )
+  React.HTMLAttributes<HTMLDivElement>
+>(function MenuArrow(_props, _ref) {
+  // Ant Design handles arrows automatically
+  return null;
 })
 
 export const MenuCheckboxItem = React.forwardRef<
   HTMLDivElement,
-  ChakraMenu.CheckboxItemProps
+  React.HTMLAttributes<HTMLDivElement> & { checked?: boolean }
 >(function MenuCheckboxItem(props, ref) {
+  const { children, checked, ...rest } = props;
+  
   return (
-    <ChakraMenu.CheckboxItem ps="8" ref={ref} {...props}>
-      <AbsoluteCenter axis="horizontal" insetStart="4" asChild>
-        <ChakraMenu.ItemIndicator>
-          <LuCheck />
-        </ChakraMenu.ItemIndicator>
-      </AbsoluteCenter>
-      {props.children}
-    </ChakraMenu.CheckboxItem>
+    <div ref={ref} {...rest}>
+      <MenuItemWithIcon>
+        {checked && <LuCheck size={14} />}
+        {children}
+      </MenuItemWithIcon>
+    </div>
   )
 })
 
 export const MenuRadioItem = React.forwardRef<
   HTMLDivElement,
-  ChakraMenu.RadioItemProps
+  React.HTMLAttributes<HTMLDivElement> & { checked?: boolean }
 >(function MenuRadioItem(props, ref) {
-  const { children, ...rest } = props
+  const { children, checked, ...rest } = props
+  
   return (
-    <ChakraMenu.RadioItem ps="8" ref={ref} {...rest}>
-      <AbsoluteCenter axis="horizontal" insetStart="4" asChild>
-        <ChakraMenu.ItemIndicator>
-          <LuCheck />
-        </ChakraMenu.ItemIndicator>
-      </AbsoluteCenter>
-      <ChakraMenu.ItemText>{children}</ChakraMenu.ItemText>
-    </ChakraMenu.RadioItem>
+    <div ref={ref} {...rest}>
+      <MenuItemWithIcon>
+        {checked && <LuCheck size={14} />}
+        {children}
+      </MenuItemWithIcon>
+    </div>
   )
 })
 
 export const MenuItemGroup = React.forwardRef<
-  HTMLDivElement,
-  ChakraMenu.ItemGroupProps
->(function MenuItemGroup(props, ref) {
+  any,
+  React.HTMLAttributes<HTMLDivElement> & { title?: React.ReactNode }
+>(function MenuItemGroup(props, _ref) {
   const { title, children, ...rest } = props
+  
   return (
-    <ChakraMenu.ItemGroup ref={ref} {...rest}>
-      {title && (
-        <ChakraMenu.ItemGroupLabel userSelect="none">
-          {title}
-        </ChakraMenu.ItemGroupLabel>
-      )}
+    <AntdMenu.ItemGroup key={title as string} title={title} {...rest}>
       {children}
-    </ChakraMenu.ItemGroup>
+    </AntdMenu.ItemGroup>
   )
 })
 
-export interface MenuTriggerItemProps extends ChakraMenu.ItemProps {
+export interface MenuTriggerItemProps extends React.HTMLAttributes<HTMLDivElement> {
   startIcon?: React.ReactNode
 }
 
@@ -92,21 +99,47 @@ export const MenuTriggerItem = React.forwardRef<
   MenuTriggerItemProps
 >(function MenuTriggerItem(props, ref) {
   const { startIcon, children, ...rest } = props
+  
   return (
-    <ChakraMenu.TriggerItem ref={ref} {...rest}>
-      {startIcon}
-      {children}
-      <LuChevronRight />
-    </ChakraMenu.TriggerItem>
+    <div ref={ref} {...rest}>
+      <MenuItemWithIcon>
+        {startIcon}
+        {children}
+        <LuChevronRight size={14} />
+      </MenuItemWithIcon>
+    </div>
   )
 })
 
-export const MenuRadioItemGroup = ChakraMenu.RadioItemGroup
-export const MenuContextTrigger = ChakraMenu.ContextTrigger
-export const MenuRoot = ChakraMenu.Root
-export const MenuSeparator = ChakraMenu.Separator
+// Simple component exports that can be used with Ant Design
+export const MenuRadioItemGroup = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>{children}</div>
+);
 
-export const MenuItem = ChakraMenu.Item
-export const MenuItemText = ChakraMenu.ItemText
-export const MenuItemCommand = ChakraMenu.ItemCommand
-export const MenuTrigger = ChakraMenu.Trigger
+export const MenuContextTrigger = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>{children}</div>
+);
+
+export const MenuRoot = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>{children}</div>
+);
+
+export const MenuSeparator = () => <Divider style={{ margin: '4px 0' }} />;
+
+export const MenuItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  function MenuItem(props, ref) {
+    return <div ref={ref} {...props} />;
+  }
+);
+
+export const MenuItemText = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span {...props}>{children}</span>
+);
+
+export const MenuItemCommand = ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span {...props}>{children}</span>
+);
+
+export const MenuTrigger = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div {...props}>{children}</div>
+);

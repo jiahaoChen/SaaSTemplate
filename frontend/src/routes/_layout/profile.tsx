@@ -1,9 +1,155 @@
-import { Box, Container, Heading, Flex, Text, Icon, Button } from "@chakra-ui/react"
+import { Typography } from "antd"
 import { createFileRoute } from "@tanstack/react-router"
 import { MdEdit } from "react-icons/md"
 import { useColorModeValue } from "@/components/ui/color-mode"
 import useLanguage from "@/hooks/useLanguage"
 import useAuth from "@/hooks/useAuth"
+import styled from "styled-components"
+import { Button } from "@/components/ui/button"
+
+const Container = styled.div`
+  max-width: 100%;
+  padding: 0 1rem;
+`
+
+const HeaderFlex = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 0;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+`
+
+const StyledHeading = styled(Typography.Title)<{ color?: string }>`
+  font-size: 1.125rem !important;
+  margin-bottom: 0 !important;
+  color: ${props => props.color} !important;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
+  @media (min-width: 769px) {
+    text-align: left;
+  }
+`
+
+const FlexContainer = styled.div<{
+  direction?: { base?: string; md?: string } | string
+  gap?: number
+}>`
+  display: flex;
+  gap: ${props => props.gap ? `${props.gap * 8}px` : '0'};
+  
+  @media (max-width: 768px) {
+    flex-direction: ${props => 
+      typeof props.direction === 'object' && props.direction.base ? props.direction.base : 
+      typeof props.direction === 'string' ? props.direction : 'row'};
+  }
+  
+  @media (min-width: 769px) {
+    flex-direction: ${props => 
+      typeof props.direction === 'object' && props.direction.md ? props.direction.md : 
+      typeof props.direction === 'string' ? props.direction : 'row'};
+  }
+`
+
+const ProfileCard = styled.div<{ 
+  bg?: string
+  borderColor?: string
+}>`
+  flex: 1;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  background: ${props => props.bg || 'white'};
+  border: 1px solid ${props => props.borderColor || '#e0e0e0'};
+`
+
+const AvatarContainer = styled.div<{
+  bg?: string
+}>`
+  border-radius: 50%;
+  background: ${props => props.bg || '#e0f2f1'};
+  padding: 16px;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+`
+
+const AvatarText = styled(Typography.Text)<{ color?: string }>`
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  color: ${props => props.color} !important;
+`
+
+const CenteredDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+`
+
+const InfoCard = styled.div<{ 
+  bg?: string
+  borderColor?: string
+}>`
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`
+
+const InfoSection = styled.div<{ 
+  bg?: string
+  borderColor?: string
+}>`
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  background: ${props => props.bg || 'white'};
+  border: 1px solid ${props => props.borderColor || '#e0e0e0'};
+`
+
+const GridContainer = styled.div`
+  display: grid;
+  gap: 16px;
+  
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 641px) {
+    grid-template-columns: 1fr 1fr;
+  }
+`
+
+const InfoItem = styled.div``
+
+const StyledText = styled(Typography.Text)<{ 
+  fontWeight?: string | number
+  color?: string
+  fontSize?: string
+}>`
+  font-weight: ${props => props.fontWeight || 'normal'} !important;
+  color: ${props => props.color} !important;
+  font-size: ${props => props.fontSize || 'inherit'} !important;
+  display: block;
+  margin-bottom: 4px;
+`
+
+const IconWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+`
 
 export const Route = createFileRoute("/_layout/profile")({
   component: UserProfile,
@@ -26,89 +172,79 @@ function UserProfile() {
   }
 
   return (
-    <Container maxW="full">
-      <Flex alignItems="center" justifyContent="space-between" py={8}>
-        <Heading size="lg" textAlign={{ base: "center", md: "left" }} color={headingColor}>
+    <Container>
+      <HeaderFlex>
+        <StyledHeading level={2} color={headingColor}>
           {t('dashboard.profile')}
-        </Heading>
-      </Flex>
+        </StyledHeading>
+      </HeaderFlex>
 
-      <Flex direction={{ base: "column", md: "row" }} gap={8}>
-        <Box flex="1" p={6} boxShadow="md" borderRadius="md" bg={bgBox} borderColor={borderColor} borderWidth="1px">
-          <Flex direction="column" alignItems="center" gap={6}>
-            <Box 
-              borderRadius="full" 
-              bg={avatarBg}
-              p={4} 
-              width="120px" 
-              height="120px" 
-              display="flex" 
-              alignItems="center" 
-              justifyContent="center"
-            >
-              <Text fontSize="4xl" fontWeight="bold" color={avatarColor}>
+      <FlexContainer direction={{ base: "column", md: "row" }} gap={8}>
+        <ProfileCard bg={bgBox} borderColor={borderColor}>
+          <CenteredDiv>
+            <AvatarContainer bg={avatarBg}>
+              <AvatarText color={avatarColor}>
                 {currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : currentUser.email.charAt(0).toUpperCase()}
-              </Text>
-            </Box>
-            <Box textAlign="center">
-              <Heading size="md" color={headingColor}>{currentUser.full_name || t('mindmap.default')}</Heading>
-              <Text color={textColor}>{currentUser.email}</Text>
-              <Text fontSize="sm" mt={2} color={textColor}>
+              </AvatarText>
+            </AvatarContainer>
+            <div>
+              <StyledHeading level={4} color={headingColor}>{currentUser.full_name || t('mindmap.default')}</StyledHeading>
+              <StyledText color={textColor}>{currentUser.email}</StyledText>
+              <StyledText fontSize="14px" color={textColor}>
                 {t('profile.accountCreated')} {new Date().getFullYear()}
-              </Text>
-            </Box>
+              </StyledText>
+            </div>
             <Button 
-              size="sm" 
-              colorScheme="blue" 
-              variant="outline"
+              size="small" 
+              style={{ borderColor: '#1677ff', color: '#1677ff' }}
               onClick={() => console.log("Edit profile clicked")}
             >
-              <Flex align="center" gap={2}>
-                <Icon as={MdEdit} />
-                <Text>{t('profile.editProfile')}</Text>
-              </Flex>
+              <IconWrapper>
+                <MdEdit />
+              </IconWrapper>
+              {t('profile.editProfile')}
             </Button>
-          </Flex>
-        </Box>
+          </CenteredDiv>
+        </ProfileCard>
 
-        <Flex flex="2" direction="column" gap={6}>
-          <Box p={6} boxShadow="md" borderRadius="md" bg={bgBox} borderColor={borderColor} borderWidth="1px">
-            <Heading size="md" mb={4} color={headingColor}>{t('profile.personalInfo')}</Heading>
-            <Box display="grid" gridTemplateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('auth.email')}</Text>
-                <Text color={headingColor}>{currentUser.email}</Text>
-              </Box>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('auth.name')}</Text>
-                <Text color={headingColor}>{currentUser.full_name || t('mindmap.default')}</Text>
-              </Box>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('profile.accountType')}</Text>
-                <Text color={headingColor}>{currentUser.is_superuser ? t('profile.administrator') : t('profile.standardUser')}</Text>
-              </Box>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('profile.accountStatus')}</Text>
-                <Text color={headingColor}>{currentUser.is_active ? t('profile.active') : t('profile.inactive')}</Text>
-              </Box>
-            </Box>
-          </Box>
+        <InfoCard>
+          <InfoSection bg={bgBox} borderColor={borderColor}>
+            <StyledHeading level={4} color={headingColor}>{t('profile.personalInfo')}</StyledHeading>
+            <GridContainer>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('auth.email')}</StyledText>
+                <StyledText color={headingColor}>{currentUser.email}</StyledText>
+              </InfoItem>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('auth.name')}</StyledText>
+                <StyledText color={headingColor}>{currentUser.full_name || t('mindmap.default')}</StyledText>
+              </InfoItem>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('profile.accountType')}</StyledText>
+                <StyledText color={headingColor}>{currentUser.is_superuser ? t('profile.administrator') : t('profile.standardUser')}</StyledText>
+              </InfoItem>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('profile.accountStatus')}</StyledText>
+                <StyledText color={headingColor}>{currentUser.is_active ? t('profile.active') : t('profile.inactive')}</StyledText>
+              </InfoItem>
+            </GridContainer>
+          </InfoSection>
 
-          <Box p={6} boxShadow="md" borderRadius="md" bg={bgBox} borderColor={borderColor} borderWidth="1px">
-            <Heading size="md" mb={4} color={headingColor}>{t('profile.activitySummary')}</Heading>
-            <Box display="grid" gridTemplateColumns={{ base: "1fr", sm: "1fr 1fr" }} gap={4}>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('profile.mindMapsCreated')}</Text>
-                <Text fontSize="2xl" color={headingColor}>0</Text>
-              </Box>
-              <Box>
-                <Text fontWeight="bold" color={textColor}>{t('profile.videosAnalyzed')}</Text>
-                <Text fontSize="2xl" color={headingColor}>0</Text>
-              </Box>
-            </Box>
-          </Box>
-        </Flex>
-      </Flex>
+          <InfoSection bg={bgBox} borderColor={borderColor}>
+            <StyledHeading level={4} color={headingColor}>{t('profile.activitySummary')}</StyledHeading>
+            <GridContainer>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('profile.mindMapsCreated')}</StyledText>
+                <StyledText fontSize="32px" color={headingColor}>0</StyledText>
+              </InfoItem>
+              <InfoItem>
+                <StyledText fontWeight="bold" color={textColor}>{t('profile.videosAnalyzed')}</StyledText>
+                <StyledText fontSize="32px" color={headingColor}>0</StyledText>
+              </InfoItem>
+            </GridContainer>
+          </InfoSection>
+        </InfoCard>
+      </FlexContainer>
     </Container>
   )
 }

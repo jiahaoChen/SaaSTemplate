@@ -1,7 +1,8 @@
-import { Button, ButtonGroup, Box } from "@chakra-ui/react"
+import { Button } from "@/components/ui/button"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import styled from 'styled-components'
 
 import { type ApiError, UsersService } from "@/client"
 import {
@@ -19,6 +20,15 @@ import useAuth from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import useLanguage from "@/hooks/useLanguage"
 import { handleError, renderHtmlTranslation } from "@/utils"
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+`
+
+const MessageBox = styled.div`
+  margin-bottom: 16px;
+`
 
 const DeleteConfirmation = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,46 +69,44 @@ const DeleteConfirmation = () => {
   return (
     <>
       <DialogRoot
-        size={{ base: "xs", md: "md" }}
-        role="alertdialog"
-        placement="center"
         open={isOpen}
-        onOpenChange={({ open }) => setIsOpen(open)}
+        onOpenChange={setIsOpen}
       >
-        <DialogTrigger asChild>
-          <Button variant="solid" colorPalette="red" mt={4}>
+        <DialogTrigger onClick={() => setIsOpen(true)}>
+          <Button type="primary" danger style={{ marginTop: '16px' }}>
             {t("common.delete")}
           </Button>
         </DialogTrigger>
 
-        <DialogContent>
+        <DialogContent
+          open={isOpen}
+          onCancel={() => setIsOpen(false)}
+          title={t("settings.deleteAccount.confirmTitle")}
+        >
           <form onSubmit={handleSubmit(onSubmit)}>
-            <DialogCloseTrigger />
+            <DialogCloseTrigger onClick={() => setIsOpen(false)} />
             <DialogHeader>
               <DialogTitle>{t("settings.deleteAccount.confirmTitle")}</DialogTitle>
             </DialogHeader>
             <DialogBody>
-              <Box 
-                mb={4} 
+              <MessageBox 
                 dangerouslySetInnerHTML={{ __html: confirmMessage }}
               />
             </DialogBody>
 
-            <DialogFooter gap={2}>
+            <DialogFooter>
               <ButtonGroup>
-                <DialogActionTrigger asChild>
+                <DialogActionTrigger onClick={() => setIsOpen(false)}>
                   <Button
-                    variant="subtle"
-                    colorPalette="gray"
                     disabled={isSubmitting}
                   >
                     {t("common.cancel")}
                   </Button>
                 </DialogActionTrigger>
                 <Button
-                  variant="solid"
-                  colorPalette="red"
-                  type="submit"
+                  type="primary"
+                  danger
+                  htmlType="submit"
                   loading={isSubmitting}
                 >
                   {t("common.delete")}
