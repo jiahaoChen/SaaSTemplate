@@ -135,5 +135,5 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  */
 export const request: RequestConfig = {
   ...errorConfig,
-  baseURL: '',
+  baseURL: 'http://localhost:8000',
 };
