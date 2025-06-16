@@ -1,4 +1,4 @@
-import { addRule } from '@/services/ant-design-pro/api';
+import * as itemsService from '@/services/localApi/items';
 import { PlusOutlined } from '@ant-design/icons';
 import { ActionType, ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, useRequest } from '@umijs/max';
@@ -19,7 +19,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
    * */
   const intl = useIntl();
 
-  const { run, loading } = useRequest(addRule, {
+  const { run, loading } = useRequest(itemsService.itemsCreateItem, {
     manual: true,
     onSuccess: () => {
       messageApi.success('Added successfully');
@@ -46,7 +46,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
         width="400px"
         modalProps={{ okButtonProps: { loading } }}
         onFinish={async (value) => {
-          await run({ data: value as API.RuleListItem });
+          await run(value as API.ItemCreate);
 
           return true;
         }}
@@ -64,9 +64,9 @@ const CreateForm: FC<CreateFormProps> = (props) => {
             },
           ]}
           width="md"
-          name="name"
+          name="title"
         />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormTextArea width="md" name="description" />
       </ModalForm>
     </>
   );

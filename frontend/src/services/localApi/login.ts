@@ -7,20 +7,12 @@ export async function loginLoginAccessToken(
   body: API.BodyLoginLoginAccessToken,
   options?: { [key: string]: any },
 ) {
-  const formData = new URLSearchParams();
-  formData.append('username', body.username);
-  formData.append('password', body.password);
-  if (body.grant_type) formData.append('grant_type', body.grant_type);
-  if (body.scope) formData.append('scope', body.scope);
-  if (body.client_id) formData.append('client_id', body.client_id);
-  if (body.client_secret) formData.append('client_secret', body.client_secret);
-
   return request<API.Token>('/api/v1/login/access-token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    data: formData.toString(),
+    data: body,
     ...(options || {}),
   });
 }

@@ -1,4 +1,4 @@
-import { removeRule, rule } from '@/services/ant-design-pro/api';
+import * as itemsService from '@/services/localApi/items';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -16,8 +16,8 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.ItemPublic>();
+  const [selectedRowsState, setSelectedRows] = useState<API.ItemPublic[]>([]);
 
   /**
    * @en-US International configuration
@@ -27,7 +27,11 @@ const TableList: React.FC = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run: delRun, loading } = useRequest(removeRule, {
+  const { run: delRun, loading } = useRequest(async (itemIds: string[]) => {
+    for (const id of itemIds) {
+      await itemsService.itemsDeleteItem({ id });
+    }
+  }, {
     manual: true,
     onSuccess: () => {
       setSelectedRows([]);
@@ -40,7 +44,7 @@ const TableList: React.FC = () => {
     },
   });
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+  const columns: ProColumns<API.ItemPublic>[] = [
     {
       title: (
         <FormattedMessage
@@ -182,18 +186,14 @@ const TableList: React.FC = () => {
    * @param selectedRows
    */
   const handleRemove = useCallback(
-    async (selectedRows: API.RuleListItem[]) => {
+    async (selectedRows: API.ItemPublic[]) => {
       if (!selectedRows?.length) {
         messageApi.warning('请选择删除项');
 
         return;
       }
 
-      await delRun({
-        data: {
-          key: selectedRows.map((row) => row.key),
-        },
-      });
+      await delRun(selectedRows.map((row) => row.id));
     },
     [delRun],
   );
@@ -201,18 +201,28 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<API.RuleListItem, API.PageParams>
+      <ProTable<API.ItemPublic, API.itemsReadItemsParams>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
         toolBarRender={() => [<CreateForm key="create" reload={actionRef.current?.reload} />]}
-        request={rule}
+        request={async (params) => {
+          const response = await itemsService.itemsReadItems({
+            skip: (params.current! - 1) * params.pageSize!,
+            limit: params.pageSize!,
+          });
+          return {
+            data: response.data,
+            success: true,
+            total: response.count,
+          };
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -227,15 +237,6 @@ const TableList: React.FC = () => {
               <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
               <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
               <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
             </div>
           }
         >
@@ -250,15 +251,19 @@ const TableList: React.FC = () => {
               defaultMessage="Batch deletion"
             />
           </Button>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
         </FooterToolbar>
       )}
-
+      <ProDescriptions<API.ItemPublic>
+        column={2}
+        title={currentRow?.title}
+        request={async () => ({
+          data: currentRow || {},
+        })}
+        params={{
+          id: currentRow?.id,
+        }}
+        columns={columns as ProDescriptionsItemProps<API.ItemPublic>[]}
+      />
       <Drawer
         width={600}
         open={showDetail}
@@ -268,17 +273,17 @@ const TableList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
+        {currentRow?.title && (
+          <ProDescriptions<API.ItemPublic>
             column={2}
-            title={currentRow?.name}
+            title={currentRow?.title}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.name,
+              id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.ItemPublic>[]}
           />
         )}
       </Drawer>
