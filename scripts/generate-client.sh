@@ -4,9 +4,8 @@ set -e
 set -x
 
 cd backend
-python -c "import app.main; import json; print(json.dumps(app.main.app.openapi()))" > ../openapi.json
+python -c "import app.main; import json; print(json.dumps(app.main.app.openapi()))" > ../oneapi.json
 cd ..
-mv openapi.json frontend/
+mv oneapi.json frontend/config/
 cd frontend
-npm run generate-client
-npx biome format --write ./src/client
+npm run openapi

@@ -1,16 +1,28 @@
 import uuid
 from datetime import datetime
+from typing import Annotated, Any
 
 from pydantic import EmailStr
+from sqlalchemy import String, Text, JSON
 from sqlmodel import Field, Relationship, SQLModel
 
 
 # Shared properties
 class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
+    email: Annotated[str, Field(unique=True, index=True, max_length=255, sa_type=String(255))]
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
+    # Enhanced profile fields from mock data
+    avatar: str | None = Field(default=None, max_length=500)
+    signature: str | None = Field(default=None, max_length=255)
+    title: str | None = Field(default=None, max_length=255)  # Job title
+    group: str | None = Field(default=None, max_length=255)  # Organization group
+    notify_count: int = Field(default=0)
+    unread_count: int = Field(default=0)
+    country: str | None = Field(default=None, max_length=100)
+    address: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=50)
 
 
 # Properties to receive via API on creation
@@ -78,7 +90,7 @@ class Item(ItemBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=255)
     owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+        foreign_key="user.id", nullable=False
     )
     owner: User | None = Relationship(back_populates="items")
 
@@ -113,3 +125,68 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# Simple Notice/Notification model
+class NoticeBase(SQLModel):
+    title: str = Field(max_length=255)
+    description: str | None = Field(default=None, max_length=500)
+    avatar: str | None = Field(default=None, max_length=500)
+    notice_type: str = Field(max_length=50)  # notification, message, event
+    read: bool = Field(default=False)
+
+
+class NoticeCreate(NoticeBase):
+    pass
+
+
+class Notice(NoticeBase, table=True):
+    __tablename__ = "notice"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    created_at: datetime = Field(default_factory=datetime.now)
+
+
+class NoticePublic(NoticeBase):
+    id: uuid.UUID
+    created_at: datetime
+
+
+class NoticesPublic(SQLModel):
+    data: list[NoticePublic]
+    count: int
+
+
+# Simple Rule model (for table list data)
+class RuleBase(SQLModel):
+    name: str = Field(max_length=255)
+    owner: str = Field(max_length=255)
+    desc: str | None = Field(default=None, max_length=500)
+    call_no: int = Field(default=0)
+    status: int = Field(default=0)
+    progress: int = Field(default=0)
+
+
+class RuleCreate(RuleBase):
+    pass
+
+
+class Rule(RuleBase, table=True):
+    __tablename__ = "rule"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    owner_id: uuid.UUID = Field(foreign_key="user.id", nullable=False)
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class RulePublic(RuleBase):
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class RulesPublic(SQLModel):
+    data: list[RulePublic]
+    count: int
+    success: bool = True
