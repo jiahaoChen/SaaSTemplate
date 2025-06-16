@@ -4,7 +4,7 @@ import { request } from '@umijs/max';
 
 /** Returns pet inventories by status Returns a map of status codes to quantities GET /store/inventory */
 export async function getInventory(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/store/inventory', {
+  return request<Record>('/store/inventory', {
     method: 'GET',
     ...(options || {}),
   });

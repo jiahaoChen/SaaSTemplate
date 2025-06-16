@@ -1,6 +1,5 @@
 import { Footer } from '@/components';
-import { login } from '@/services/ant-design-pro/api';
-import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { loginLoginAccessToken as login } from '@/services/ant-design-pro/login';
 import {
   AlipayCircleOutlined,
   LockOutlined,
@@ -117,8 +116,15 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      const tokenResponse = await login({
+        username: values.username,
+        password: values.password
+      });
+
+      if (tokenResponse.access_token) {
+        // Store the token in localStorage (using 'token' key to match request interceptor)
+        localStorage.setItem('token', tokenResponse.access_token);
+
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
@@ -129,9 +135,9 @@ const Login: React.FC = () => {
         window.location.href = urlParams.get('redirect') || '/';
         return;
       }
-      console.log(msg);
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
+
+      // If we get here, login failed
+      setUserLoginState({ status: 'error', type: 'account' });
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -139,6 +145,7 @@ const Login: React.FC = () => {
       });
       console.log(error);
       message.error(defaultLoginFailureMessage);
+      setUserLoginState({ status: 'error', type: 'account' });
     }
   };
   const { status, type: loginType } = userLoginState;
@@ -334,12 +341,8 @@ const Login: React.FC = () => {
                   },
                 ]}
                 onGetCaptcha={async (phone) => {
-                  const result = await getFakeCaptcha({
-                    phone,
-                  });
-                  if (!result) {
-                    return;
-                  }
+                  // Mock captcha function for demo purposes
+                  console.log('Getting captcha for phone:', phone);
                   message.success('获取验证码成功！验证码为：1234');
                 }}
               />

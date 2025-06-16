@@ -72,6 +72,13 @@ export const errorConfig: RequestConfig = {
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
+        if (error.response.status === 401) {
+          // 未授权，清除token并跳转到登录页
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+          window.location.href = '/user/login';
+          return;
+        }
         message.error(`Response status:${error.response.status}`);
       } else if (error.request) {
         // 请求已经成功发起，但没有收到响应
@@ -88,9 +95,15 @@ export const errorConfig: RequestConfig = {
   // 请求拦截器
   requestInterceptors: [
     (config: RequestOptions) => {
-      // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token = 123');
-      return { ...config, url };
+      // 添加认证token到请求头
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+      }
+      return config;
     },
   ],
 
