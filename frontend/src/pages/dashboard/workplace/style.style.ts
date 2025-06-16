@@ -175,7 +175,7 @@ const useStyles = createStyles(({ token }) => {
       marginTop: '8px',
       overflow: 'hidden',
       fontSize: '12px',
-      gap: 'epx',
+      gap: '0px',
       lineHeight: '20px',
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',

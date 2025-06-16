@@ -92,15 +92,19 @@ const Workplace: FC = () => {
   const { loading: projectLoading, data: projectNotice = [] } = useRequest(queryProjectNotice);
   const { loading: activitiesLoading, data: activities = [] } = useRequest(queryActivities);
   const { data } = useRequest(fakeChartData);
+
   const renderActivities = (item: ActivitiesType) => {
     const events = item.template.split(/@\{([^{}]*)\}/gi).map((key) => {
       if (item[key as keyof ActivitiesType]) {
-        const value = item[key as 'user'];
-        return (
-          <a href={value?.link} key={value?.name}>
-            {value.name}
-          </a>
-        );
+        const value = item[key as keyof ActivitiesType];
+        if (typeof value === 'object' && value !== null && 'link' in value && 'name' in value) {
+          return (
+            <a href={(value as { link?: string }).link} key={(value as { name: string }).name}>
+              {(value as { name: string }).name}
+            </a>
+          );
+        }
+        return key;
       }
       return key;
     });
@@ -137,6 +141,22 @@ const Workplace: FC = () => {
             signature: '海纳百川，有容乃大',
             title: '交互专家',
             group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+            tags: [],
+            notifyCount: 0,
+            unreadCount: 0,
+            country: 'China',
+            geographic: {
+              province: {
+                label: '浙江省',
+                key: '330000',
+              },
+              city: {
+                label: '杭州市',
+                key: '330100',
+              },
+            },
+            address: '西湖区工专路 77 号',
+            phone: '0752-268888888',
           }}
         />
       }
@@ -161,10 +181,12 @@ const Workplace: FC = () => {
             {projectNotice.map((item) => (
               <Card.Grid className={styles.projectGrid} key={item.id}>
                 <Card
-                  bodyStyle={{
-                    padding: 0,
+                  styles={{
+                    body: {
+                      padding: 0,
+                    },
                   }}
-                  bordered={false}
+                  variant="borderless"
                 >
                   <Card.Meta
                     title={

@@ -14,6 +14,7 @@ export default {
   'pages.login.phoneNumber.placeholder': 'Phone Number',
   'pages.login.phoneNumber.required': 'Please input your phone number!',
   'pages.login.phoneNumber.invalid': 'Phone number is invalid!',
+  'pages.login.verificationCode.placeholder': 'Verification Code',
   'pages.login.captcha.placeholder': 'Verification Code',
   'pages.login.captcha.required': 'Please input verification code!',
   'pages.login.phoneLogin.getVerificationCode': 'Get Code',
