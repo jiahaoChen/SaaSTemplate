@@ -93,6 +93,8 @@ const Workplace: FC = () => {
   const { loading: activitiesLoading, data: activities = [] } = useRequest(queryActivities);
   const { data } = useRequest(fakeChartData);
 
+  console.log('Project Notice Data:', projectNotice);
+
   const renderActivities = (item: ActivitiesType) => {
     const events = (item.template || '').split(/@\{([^{}]*)\}/gi).map((key) => {
       if (item[key as keyof ActivitiesType]) {
