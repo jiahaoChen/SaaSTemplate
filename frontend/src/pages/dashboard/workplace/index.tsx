@@ -210,8 +210,10 @@ const Workplace: FC = () => {
             ))}
           </Card>
           <Card
-            bodyStyle={{
-              padding: 0,
+            styles={{
+              body: {
+                padding: 0,
+              },
             }}
             variant="borderless"
             className={styles.activeCard}
@@ -278,9 +280,11 @@ const Workplace: FC = () => {
             </div>
           </Card>
           <Card
-            bodyStyle={{
-              paddingTop: 12,
-              paddingBottom: 12,
+            styles={{
+              body: {
+                paddingTop: 12,
+                paddingBottom: 12,
+              },
             }}
             variant="borderless"
             title="团队"

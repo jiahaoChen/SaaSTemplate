@@ -173,7 +173,7 @@ export const BasicList: FC = () => {
     <div>
       <PageContainer>
         <div className={styles.standardList}>
-          <Card bordered={false}>
+          <Card variant="borderless">
             <Row>
               <Col sm={8} xs={24}>
                 <Info title="我的待办" value="8个任务" bordered />
@@ -189,7 +189,7 @@ export const BasicList: FC = () => {
 
           <Card
             className={styles.listCard}
-            bordered={false}
+            variant="borderless"
             title="基本列表"
             style={{
               marginTop: 24,

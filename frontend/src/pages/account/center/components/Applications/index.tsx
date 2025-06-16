@@ -36,7 +36,7 @@ export function formatWan(val: number) {
   return result;
 }
 const Applications: React.FC = () => {
-  const { styles: stylesApplications } = useStyles();
+  const { styles } = useStyles();
   // 获取tab列表数据
   const { data: listData } = useRequest(() => {
     return queryFakeList({
@@ -48,7 +48,7 @@ const Applications: React.FC = () => {
     activeUser: React.ReactNode;
     newUser: React.ReactNode;
   }> = ({ activeUser, newUser }) => (
-    <div className={stylesApplications.cardInfo}>
+    <div className={styles.cardInfo}>
       <div>
         <p>活跃用户</p>
         <p>{activeUser}</p>
@@ -62,7 +62,7 @@ const Applications: React.FC = () => {
   return (
     <List<ListItemDataType>
       rowKey="id"
-      className={stylesApplications.filterCardList}
+      className={styles.filterCardList}
       grid={{
         gutter: 24,
         xxl: 3,
@@ -77,8 +77,10 @@ const Applications: React.FC = () => {
         <List.Item key={item.id}>
           <Card
             hoverable
-            bodyStyle={{
-              paddingBottom: 20,
+            styles={{
+              body: {
+                paddingBottom: 20,
+              },
             }}
             actions={[
               <Tooltip key="download" title="下载">
@@ -91,16 +93,18 @@ const Applications: React.FC = () => {
                 <ShareAltOutlined />
               </Tooltip>,
               <Dropdown
-                items={[
-                  {
-                    key: '1',
-                    title: '1st menu item',
-                  },
-                  {
-                    key: '2',
-                    title: '2nd menu item',
-                  },
-                ]}
+                menu={{
+                  items: [
+                    {
+                      key: '1',
+                      label: '1st menu item',
+                    },
+                    {
+                      key: '2',
+                      label: '2nd menu item',
+                    },
+                  ],
+                }}
                 key="ellipsis"
               >
                 <EllipsisOutlined />

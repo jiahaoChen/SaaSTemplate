@@ -1,7 +1,6 @@
 import { UploadOutlined } from '@ant-design/icons';
 import {
   ProForm,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
@@ -11,11 +10,15 @@ import React from 'react';
 import { queryCurrent } from '../service';
 import useStyles from './index.style';
 import { usersUpdateUserMe } from '@/services/ant-design-pro/users';
-import type { UploadFile } from 'antd/lib/upload/interface';
 
 const BaseView: React.FC = () => {
   const { styles } = useStyles();
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const { data: currentUser, loading, refresh } = useRequest(() => {
+    return queryCurrent();
+  });
 
   // 头像组件 方便以后独立，增加裁剪之类的功能
   const AvatarView = ({ avatar }: { avatar: string }) => (
@@ -35,12 +38,12 @@ const BaseView: React.FC = () => {
           console.log('File size (bytes):', file.size);
           const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
           if (!isJpgOrPng) {
-            message.error('您只能上傳 JPG/PNG 文件!');
+            messageApi.error('您只能上傳 JPG/PNG 文件!');
           }
           const isLt2M = file.size / 1024 / 1024 < 2;
           console.log('isLt2M result:', isLt2M);
           if (!isLt2M) {
-            message.error('[DEV] 圖片大小超過限制！'); // Modified error message for debugging
+            messageApi.error('[DEV] 圖片大小超過限制！'); // Modified error message for debugging
           }
           return isJpgOrPng && isLt2M;
         }}
@@ -56,10 +59,10 @@ const BaseView: React.FC = () => {
                 },
               });
             }
-            message.success(`${info.file.name} 文件上傳成功`);
+            messageApi.success(`${info.file.name} 文件上傳成功`);
             refresh(); // Re-fetch user data to ensure UI is updated
           } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} 文件上傳失敗.`);
+            messageApi.error(`${info.file.name} 文件上傳失敗.`);
             console.error('上傳失敗:', info.file.response); // Log backend error response for debugging
           }
         }}
@@ -73,9 +76,6 @@ const BaseView: React.FC = () => {
       </Upload>
     </>
   );
-  const { data: currentUser, loading, refresh } = useRequest(() => {
-    return queryCurrent();
-  });
   const getAvatarURL = () => {
     if (currentUser) {
       if (currentUser.avatar) {
@@ -107,14 +107,15 @@ const BaseView: React.FC = () => {
         });
       }
       refresh(); // Re-fetch user data to ensure UI is updated
-      message.success('更新基本信息成功');
+      messageApi.success('更新基本信息成功');
     } catch (error) {
-      message.error('更新基本信息失敗，請重試！');
+      messageApi.error('更新基本信息失敗，請重試！');
       console.error('更新失敗:', error);
     }
   };
   return (
     <div className={styles.baseView}>
+      {contextHolder}
       {loading ? null : (
         <>
           <div className={styles.left}>
