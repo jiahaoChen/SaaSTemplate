@@ -6,6 +6,8 @@ export type TagType = {
 export type GeographicItemType = {
   name: string;
   id: string;
+  label: string;
+  key: string;
 };
 
 export type GeographicType = {
@@ -40,4 +42,5 @@ export type CurrentUser = {
   geographic: GeographicType;
   address: string;
   phone: string;
+  full_name?: string;
 };

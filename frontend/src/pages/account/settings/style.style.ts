@@ -13,26 +13,11 @@ const useStyles = createStyles(({ token }) => {
         borderBottom: `1px solid ${token.colorSplit}`,
       },
       '.ant-list-item': { paddingTop: '14px', paddingBottom: '14px' },
-      [`@media screen and (max-width: ${token.screenMD}px)`]: {
-        flexDirection: 'column',
-      },
-    },
-    leftMenu: {
-      width: '224px',
-      borderRight: `${token.lineWidth}px solid ${token.colorSplit}`,
-      '.ant-menu-inline': { border: 'none' },
-      '.ant-menu-horizontal': { fontWeight: 'bold' },
-      [`@media screen and (max-width: ${token.screenMD}px)`]: {
-        width: '100%',
-        border: 'none',
-      },
+      flexDirection: 'column',
     },
     right: {
       flex: '1',
-      padding: '8px 40px',
-      [`@media screen and (max-width: ${token.screenMD}px)`]: {
-        padding: '40px',
-      },
+      padding: '40px',
     },
     title: {
       marginBottom: '12px',

@@ -1,30 +1,21 @@
 import { UploadOutlined } from '@ant-design/icons';
 import {
   ProForm,
-  ProFormDependency,
-  ProFormFieldSet,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import { useRequest } from '@umijs/max';
-import { Button, Input, message, Upload } from 'antd';
+import { useModel, useRequest } from '@umijs/max';
+import { Button, message, Upload } from 'antd';
 import React from 'react';
-import { queryCity, queryCurrent, queryProvince } from '../service';
+import { queryCurrent } from '../service';
 import useStyles from './index.style';
-
-const validatorPhone = (rule: any, value: string[], callback: (message?: string) => void) => {
-  if (!value[0]) {
-    callback('Please input your area code!');
-  }
-  if (!value[1]) {
-    callback('Please input your phone number!');
-  }
-  callback();
-};
+import { usersUpdateUserMe } from '@/services/ant-design-pro/users';
 
 const BaseView: React.FC = () => {
   const { styles } = useStyles();
+  const { initialState, setInitialState } = useModel('@@initialState');
+
   // 头像组件 方便以后独立，增加裁剪之类的功能
   const AvatarView = ({ avatar }: { avatar: string }) => (
     <>
@@ -42,7 +33,7 @@ const BaseView: React.FC = () => {
       </Upload>
     </>
   );
-  const { data: currentUser, loading } = useRequest(() => {
+  const { data: currentUser, loading, refresh } = useRequest(() => {
     return queryCurrent();
   });
   const getAvatarURL = () => {
@@ -55,8 +46,32 @@ const BaseView: React.FC = () => {
     }
     return '';
   };
-  const handleFinish = async () => {
-    message.success('更新基本信息成功');
+  const handleFinish = async (values: { email: string; name: string; profile: string }) => {
+    try {
+      const updatedUser = await usersUpdateUserMe({
+        email: values.email,
+        full_name: values.name,
+        signature: values.profile,
+      });
+
+      if (initialState?.currentUser) {
+        setInitialState({
+          ...initialState,
+          currentUser: {
+            ...initialState.currentUser,
+            email: updatedUser.email,
+            full_name: updatedUser.full_name,
+            signature: updatedUser.signature,
+            avatar: updatedUser.avatar || initialState.currentUser.avatar,
+          },
+        });
+      }
+      refresh(); // Re-fetch user data to ensure UI is updated
+      message.success('更新基本信息成功');
+    } catch (error) {
+      message.error('更新基本信息失敗，請重試！');
+      console.error('更新失敗:', error);
+    }
   };
   return (
     <div className={styles.baseView}>
@@ -74,7 +89,8 @@ const BaseView: React.FC = () => {
               }}
               initialValues={{
                 ...currentUser,
-                phone: currentUser?.phone.split('-'),
+                name: currentUser?.name || currentUser?.full_name, // Ensure 'name' field is populated
+                profile: currentUser?.signature, // Map signature to profile for display
               }}
               hideRequiredMark
             >
@@ -111,111 +127,6 @@ const BaseView: React.FC = () => {
                 ]}
                 placeholder="个人简介"
               />
-              <ProFormSelect
-                width="sm"
-                name="country"
-                label="国家/地区"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的国家或地区!',
-                  },
-                ]}
-                options={[
-                  {
-                    label: '中国',
-                    value: 'China',
-                  },
-                ]}
-              />
-
-              <ProForm.Group title="所在省市" size={8}>
-                <ProFormSelect
-                  rules={[
-                    {
-                      required: true,
-                      message: '请输入您的所在省!',
-                    },
-                  ]}
-                  width="sm"
-                  fieldProps={{
-                    labelInValue: true,
-                  }}
-                  name="province"
-                  className={styles.item}
-                  request={async () => {
-                    return queryProvince().then(({ data }) => {
-                      return data.map((item) => {
-                        return {
-                          label: item.name,
-                          value: item.id,
-                        };
-                      });
-                    });
-                  }}
-                />
-                <ProFormDependency name={['province']}>
-                  {({ province }) => {
-                    return (
-                      <ProFormSelect
-                        params={{
-                          key: province?.value,
-                        }}
-                        name="city"
-                        width="sm"
-                        rules={[
-                          {
-                            required: true,
-                            message: '请输入您的所在城市!',
-                          },
-                        ]}
-                        disabled={!province}
-                        className={styles.item}
-                        request={async () => {
-                          if (!province?.key) {
-                            return [];
-                          }
-                          return queryCity(province.key || '').then(({ data }) => {
-                            return data.map((item) => {
-                              return {
-                                label: item.name,
-                                value: item.id,
-                              };
-                            });
-                          });
-                        }}
-                      />
-                    );
-                  }}
-                </ProFormDependency>
-              </ProForm.Group>
-              <ProFormText
-                width="md"
-                name="address"
-                label="街道地址"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的街道地址!',
-                  },
-                ]}
-              />
-              <ProFormFieldSet
-                name="phone"
-                label="联系电话"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入您的联系电话!',
-                  },
-                  {
-                    validator: validatorPhone,
-                  },
-                ]}
-              >
-                <Input className={styles.area_code} />
-                <Input className={styles.phone_number} />
-              </ProFormFieldSet>
             </ProForm>
           </div>
           <div className={styles.right}>
@@ -226,4 +137,5 @@ const BaseView: React.FC = () => {
     </div>
   );
 };
+
 export default BaseView;

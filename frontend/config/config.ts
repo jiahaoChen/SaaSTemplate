@@ -155,6 +155,10 @@ export default defineConfig({
   },
   mfsu: {
     strategy: 'normal',
+    shared: {
+      '@babel/runtime': { singleton: true },
+      'regenerator-runtime': { singleton: true },
+    },
   },
   esbuildMinifyIIFE: true,
   requestRecord: {},

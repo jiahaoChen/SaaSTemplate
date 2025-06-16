@@ -137,6 +137,24 @@ declare namespace API {
     full_name?: string | null;
     /** Id */
     id: string;
+    /** Avatar */
+    avatar?: string;
+    /** Signature */
+    signature?: string | null;
+    /** Title */
+    title?: string | null;
+    /** Group */
+    group?: string | null;
+    /** Notify Count */
+    notify_count?: number;
+    /** Unread Count */
+    unread_count?: number;
+    /** Country */
+    country?: string | null;
+    /** Address */
+    address?: string | null;
+    /** Phone */
+    phone?: string | null;
   };
 
   type UserRegister = {
@@ -190,6 +208,8 @@ declare namespace API {
     full_name?: string | null;
     /** Email */
     email?: string | null;
+    /** Signature */
+    signature?: string | null;
   };
 
   type utilsTestEmailParams = {
