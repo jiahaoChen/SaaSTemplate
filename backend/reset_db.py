@@ -3,6 +3,7 @@
 import asyncio
 from sqlmodel import SQLModel, create_engine, Session, text
 from app.core.config import settings
+from app.core.security import get_password_hash
 from app.models import User, Item, Notice, Rule
 import uuid
 from datetime import datetime
@@ -41,8 +42,8 @@ def reset_database():
     with Session(engine) as session:
         logger.info("Creating sample user...")
         user = User(
-            email="admin@example.com",
-            hashed_password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # secret
+            email=settings.FIRST_SUPERUSER,
+            hashed_password=get_password_hash(settings.FIRST_SUPERUSER_PASSWORD),
             full_name="Admin User",
             is_active=True,
             is_superuser=True,
