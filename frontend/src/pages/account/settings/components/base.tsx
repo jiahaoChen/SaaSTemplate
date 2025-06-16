@@ -11,6 +11,7 @@ import React from 'react';
 import { queryCurrent } from '../service';
 import useStyles from './index.style';
 import { usersUpdateUserMe } from '@/services/ant-design-pro/users';
+import type { UploadFile } from 'antd/lib/upload/interface';
 
 const BaseView: React.FC = () => {
   const { styles } = useStyles();
@@ -23,7 +24,46 @@ const BaseView: React.FC = () => {
       <div className={styles.avatar}>
         <img src={avatar} alt="avatar" />
       </div>
-      <Upload showUploadList={false}>
+      <Upload
+        name="file"
+        action="/api/v1/users/me/avatar" // Backend API endpoint for avatar upload
+        headers={{
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }}
+        showUploadList={false}
+        beforeUpload={(file) => {
+          console.log('File size (bytes):', file.size);
+          const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+          if (!isJpgOrPng) {
+            message.error('您只能上傳 JPG/PNG 文件!');
+          }
+          const isLt2M = file.size / 1024 / 1024 < 2;
+          console.log('isLt2M result:', isLt2M);
+          if (!isLt2M) {
+            message.error('[DEV] 圖片大小超過限制！'); // Modified error message for debugging
+          }
+          return isJpgOrPng && isLt2M;
+        }}
+        onChange={(info) => {
+          if (info.file.status === 'done') {
+            const uploadedUser = info.file.response; // Correctly access the user object directly from response
+            if (initialState?.currentUser && uploadedUser) {
+              setInitialState({
+                ...initialState,
+                currentUser: {
+                  ...initialState.currentUser,
+                  avatar: uploadedUser.avatar || initialState.currentUser.avatar,
+                },
+              });
+            }
+            message.success(`${info.file.name} 文件上傳成功`);
+            refresh(); // Re-fetch user data to ensure UI is updated
+          } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} 文件上傳失敗.`);
+            console.error('上傳失敗:', info.file.response); // Log backend error response for debugging
+          }
+        }}
+      >
         <div className={styles.button_view}>
           <Button>
             <UploadOutlined />

@@ -210,6 +210,8 @@ declare namespace API {
     email?: string | null;
     /** Signature */
     signature?: string | null;
+    /** Avatar */
+    avatar?: string | null;
   };
 
   type utilsTestEmailParams = {

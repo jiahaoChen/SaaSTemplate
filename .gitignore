@@ -11,3 +11,4 @@ node_modules/
 
 # Service account credentials
 sa-key.json
+**/avatars/**

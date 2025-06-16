@@ -4,15 +4,40 @@
  */
  (function () {
   const _root = document.querySelector('#root');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = localStorage.getItem('antd-pro-theme') || (prefersDark ? 'dark' : 'light');
+
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+
   if (_root && _root.innerHTML === '') {
     _root.innerHTML = `
       <style>
+        :root {
+          --loading-background: #f0f2f5;
+          --loading-text-color: rgba(0, 0, 0, 0.85);
+          --loading-sub-text-color: #888;
+          --loading-spinner-color: #1890ff;
+        }
+
+        [data-theme='dark'] {
+          --loading-background: #141414;
+          --loading-text-color: rgba(255, 255, 255, 0.85);
+          --loading-sub-text-color: #aaa;
+          --loading-spinner-color: #1890ff; /* Keep spinner color consistent */
+        }
+
         html,
         body,
         #root {
           height: 100%;
           margin: 0;
           padding: 0;
+          background-color: var(--loading-background);
+          transition: background-color 0.3s;
         }
         #root {
           background-repeat: no-repeat;
@@ -21,12 +46,13 @@
 
         .loading-title {
           font-size: 1.1rem;
+          color: var(--loading-text-color);
         }
 
         .loading-sub-title {
           margin-top: 20px;
           font-size: 1rem;
-          color: #888;
+          color: var(--loading-sub-text-color);
         }
 
         .page-loading-warp {
@@ -42,8 +68,7 @@
           box-sizing: border-box;
           margin: 0;
           padding: 0;
-          color: rgba(0, 0, 0, 0.65);
-          color: #1890ff;
+          color: var(--loading-spinner-color);
           font-size: 14px;
           font-variant: tabular-nums;
           line-height: 1.5;
@@ -59,6 +84,7 @@
             -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
           -webkit-font-feature-settings: "tnum";
           font-feature-settings: "tnum";
+          background-color: var(--loading-spinner-color);
         }
 
         .ant-spin-spinning {
@@ -140,7 +166,7 @@
 
         @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
           .ant-spin-blur {
-            background: #fff;
+            background: var(--loading-background);
             opacity: 0.5;
           }
         }

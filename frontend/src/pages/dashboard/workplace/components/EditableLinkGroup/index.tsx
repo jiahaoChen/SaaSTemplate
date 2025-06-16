@@ -8,18 +8,21 @@ export type EditableLink = {
   id?: string;
 };
 type EditableLinkGroupProps = {
-  onAdd: () => void;
-  links: EditableLink[];
-  linkElement: any;
+  onAdd?: () => void;
+  links?: EditableLink[];
+  linkElement?: any;
 };
-const EditableLinkGroup: React.FC<EditableLinkGroupProps> = (props) => {
+const EditableLinkGroup: React.FC<EditableLinkGroupProps> = ({
+  links = [],
+  linkElement: LinkElement = 'a',
+  onAdd = () => {},
+}) => {
   const { styles } = useStyles();
-  const { links, linkElement, onAdd } = props;
   return (
     <div className={styles.linkGroup}>
       {links.map((link) =>
         createElement(
-          linkElement,
+          LinkElement,
           {
             key: `linkGroup-item-${link.id || link.title}`,
             to: link.href,
@@ -33,10 +36,5 @@ const EditableLinkGroup: React.FC<EditableLinkGroupProps> = (props) => {
       </Button>
     </div>
   );
-};
-EditableLinkGroup.defaultProps = {
-  links: [],
-  onAdd: () => {},
-  linkElement: 'a',
 };
 export default EditableLinkGroup;

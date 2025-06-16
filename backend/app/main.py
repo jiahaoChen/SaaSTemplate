@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from app.api.main import api_router
 from app.core.config import settings
@@ -50,3 +51,6 @@ if settings.all_cors_origins:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Serve static files (e.g., uploaded avatars)
+app.mount("/static", StaticFiles(directory="backend/static"), name="static")

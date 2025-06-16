@@ -1,7 +1,9 @@
 import uuid
+import shutil
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlmodel import col, delete, func, select
 
 from app import crud
@@ -28,6 +30,36 @@ from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+# Ensure avatar upload directory exists
+AVATAR_DIR = Path("backend/static/avatars")
+AVATAR_DIR.mkdir(parents=True, exist_ok=True)
+
+@router.post("/me/avatar", response_model=UserPublic)
+async def upload_avatar(
+    *, session: SessionDep, current_user: CurrentUser, file: UploadFile = File(...), request: Request
+) -> Any:
+    """
+    Upload and update user avatar.
+    """
+    try:
+        file_extension = Path(file.filename).suffix
+        # Generate a unique filename using user ID to prevent clashes
+        avatar_filename = f"{current_user.id}{file_extension}"
+        avatar_path = AVATAR_DIR / avatar_filename
+        
+        with open(avatar_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Update user's avatar URL with full URL from backend
+        avatar_url = f"{request.base_url}static/avatars/{avatar_filename}"
+        
+        current_user.avatar = avatar_url
+        session.add(current_user)
+        session.commit()
+        session.refresh(current_user)
+        return current_user
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload avatar: {e}")
 
 @router.get(
     "/",
