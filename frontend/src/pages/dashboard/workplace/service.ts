@@ -4,7 +4,7 @@ import type { ActivitiesType, AnalysisData, NoticeType } from './data.d';
 export async function queryProjectNotice(options?: { [key: string]: any }) {
   return request<{
     data: NoticeType[];
-  }>('/api/v1/project/notice', options || {});
+  }>('/api/v1/notices', options || {});
 }
 
 export async function queryActivities(options?: { [key: string]: any }) {

@@ -94,7 +94,7 @@ const Workplace: FC = () => {
   const { data } = useRequest(fakeChartData);
 
   const renderActivities = (item: ActivitiesType) => {
-    const events = item.template.split(/@\{([^{}]*)\}/gi).map((key) => {
+    const events = (item.template || '').split(/@\{([^{}]*)\}/gi).map((key) => {
       if (item[key as keyof ActivitiesType]) {
         const value = item[key as keyof ActivitiesType];
         if (typeof value === 'object' && value !== null && 'link' in value && 'name' in value) {
@@ -111,10 +111,10 @@ const Workplace: FC = () => {
     return (
       <List.Item key={item.id}>
         <List.Item.Meta
-          avatar={<Avatar src={item.user.avatar} />}
+          avatar={<Avatar src={item.user?.avatar || ''} />}
           title={
             <span>
-              <a className={styles.username}>{item.user.name}</a>
+              <a className={styles.username}>{item.user?.name}</a>
               &nbsp;
               <span className={styles.event}>{events}</span>
             </span>
@@ -297,7 +297,7 @@ const Workplace: FC = () => {
                     <Col span={12} key={`members-item-${item.id}`}>
                       <a>
                         <Avatar src={item.logo} size="small" />
-                        <span className={styles.member}>{item.member.substring(0, 3)}</span>
+                        <span className={styles.member}>{(item.member || '').substring(0, 3)}</span>
                       </a>
                     </Col>
                   );
