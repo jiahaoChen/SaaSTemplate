@@ -131,6 +131,8 @@ Don't run the application, I will test by myself.
 - ✅ **Premium UI**: Glassmorphism, gradients, shadows, modern typography
 - ✅ **Performance**: Optimized animations and efficient state management
 - ✅ **Accessibility**: Full screen reader and keyboard navigation support
+- ✅ **Icon Visibility**: Adjusted button styles in top-right for clear visibility against background.
+- ✅ **Routing Fix**: Corrected root path redirection for unauthenticated users to landing page instead of login.
 
 **Next Steps for User**:
 1. Start frontend: `cd frontend && npm start` (port 8001)
@@ -954,4 +956,4 @@ data: formData.toString()
 - **Database**: PostgreSQL with proper user management
 - **CORS**: Configured for cross-origin requests between ports
 
-The SaaS template is now fully functional with working authentication and user registration! 🚀
+The SaaS template is now fully functional with working authentication! 🚀

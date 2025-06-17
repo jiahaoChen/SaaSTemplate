@@ -8,10 +8,26 @@ import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { usersReadUserMe as queryCurrentUser } from './services/ant-design-pro/users';
 import { ConfigProvider, theme } from 'antd';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import React from 'react';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const landingPath = '/landing';
+
+// A new component to wrap the main application content and apply the global theme
+const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isDarkMode } = useTheme();
+  return (
+    <ConfigProvider
+      theme={{
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      }}
+    >
+      {children}
+    </ConfigProvider>
+  );
+};
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -32,7 +48,8 @@ export async function getInitialState(): Promise<{
       }
       return msg;
     } catch (error) {
-      history.push(loginPath);
+      // Do not redirect here, let onPageChange handle unauthenticated users for landing page
+      // history.push(loginPath);
     }
     return undefined;
   };
@@ -52,10 +69,21 @@ export async function getInitialState(): Promise<{
   };
 }
 
+// A component to render actions in the layout header, consuming the global theme
+const HeaderActions: React.FC = () => {
+  const { isDarkMode } = useTheme();
+  return (
+    <>
+      <Question key="doc" />
+      <SelectLang key="SelectLang" isDark={isDarkMode} />
+    </>
+  );
+};
+
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" isDark={initialState?.settings?.navTheme === 'realDark'} />],
+    actionsRender: () => [<HeaderActions key="headerActions" />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -110,11 +138,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
-        <ConfigProvider
-          theme={{
-            algorithm: initialState?.settings?.navTheme === 'realDark' ? theme.darkAlgorithm : undefined,
-          }}
-        >
+        <>
           {children}
           {isDev && (
             <SettingDrawer
@@ -129,12 +153,20 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               }}
             />
           )}
-        </ConfigProvider>
+        </>
       );
     },
     ...initialState?.settings,
   };
 };
+
+export function rootContainer(container: JSX.Element) {
+  return (
+    <ThemeProvider>
+      <AppWrapper>{container}</AppWrapper>
+    </ThemeProvider>
+  );
+}
 
 /**
  * @name request 配置，可以配置错误处理

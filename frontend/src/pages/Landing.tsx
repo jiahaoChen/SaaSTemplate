@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Card, Row, Col, Typography, Space, Avatar, Tag, Dropdown, FloatButton, ConfigProvider, theme } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Row, Col, Typography, Space, Avatar, Tag, FloatButton, Dropdown } from 'antd';
 import {
   RocketOutlined,
   SafetyOutlined,
@@ -17,6 +17,7 @@ import {
   SettingOutlined
 } from '@ant-design/icons';
 import { history, useIntl, setLocale, getLocale } from '@umijs/max';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -34,7 +35,7 @@ const languageOptions = [
 
 const Landing: React.FC = () => {
   const intl = useIntl();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme(); // Use global theme context
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(new Set());
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -57,10 +58,6 @@ const Landing: React.FC = () => {
     setLocale(key);
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   // Intersection Observer for scroll animations
   useEffect(() => {
     const elements = [
@@ -77,7 +74,7 @@ const Landing: React.FC = () => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute('data-animate-id');
             if (id) {
-              setAnimatedElements(prev => new Set([...prev, id]));
+              setAnimatedElements((prev: Set<string>) => new Set([...prev, id]));
             }
           }
         });
@@ -99,15 +96,6 @@ const Landing: React.FC = () => {
       observerRef.current?.disconnect();
     };
   }, []);
-
-  // Theme configuration
-  const themeConfig = {
-    algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
-    token: {
-      colorPrimary: '#667eea',
-      borderRadius: 16,
-    },
-  };
 
   // Dynamic colors based on theme
   const colors = {
@@ -334,46 +322,9 @@ const Landing: React.FC = () => {
   }));
 
   return (
-    <ConfigProvider theme={themeConfig}>
-      <div style={landingContainerStyle}>
+    <div style={landingContainerStyle}>
         {/* Top Bar with Language Selector and Theme Toggle */}
-        <div style={topBarStyle}>
-          <Dropdown
-            menu={{
-              items: languageMenuItems,
-              onClick: handleLanguageChange,
-              selectedKeys: [getLocale()],
-            }}
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              icon={<GlobalOutlined />}
-              style={{
-                color: isDarkMode ? 'white' : '#666',
-                background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                backdropFilter: 'blur(10px)',
-                border: 'none',
-                borderRadius: '12px',
-              }}
-            >
-              {languageOptions.find(option => option.key === getLocale())?.flag || '🌐'}
-            </Button>
-          </Dropdown>
-
-          <Button
-            type="text"
-            icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
-            onClick={toggleTheme}
-            style={{
-              color: isDarkMode ? 'white' : '#666',
-              background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-              backdropFilter: 'blur(10px)',
-              border: 'none',
-              borderRadius: '12px',
-            }}
-          />
-        </div>
+        <div style={topBarStyle}></div>
 
         {/* Floating particles */}
         <div style={particlesStyle}>
@@ -674,10 +625,19 @@ const Landing: React.FC = () => {
             tooltip="Toggle Theme"
             onClick={toggleTheme}
           />
-          <FloatButton
-            icon={<GlobalOutlined />}
-            tooltip="Change Language"
-          />
+          <Dropdown
+            menu={{
+              items: languageMenuItems,
+              onClick: handleLanguageChange,
+              selectedKeys: [getLocale()],
+            }}
+            placement="bottomLeft"
+          >
+            <FloatButton
+              icon={<GlobalOutlined />}
+              tooltip="Change Language"
+            />
+          </Dropdown>
         </FloatButton.Group>
 
         {/* CSS Animations */}
@@ -774,7 +734,6 @@ const Landing: React.FC = () => {
           `}
         </style>
       </div>
-    </ConfigProvider>
   );
 };
 
