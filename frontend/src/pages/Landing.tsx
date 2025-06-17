@@ -55,8 +55,16 @@ const Landing: React.FC = () => {
   };
 
   const handleLanguageChange = ({ key }: { key: string }) => {
-    setLocale(key);
+    setLocale(key, false); // false to not reload page
+    localStorage.setItem('app-language', key);
   };
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('app-language');
+    if (savedLanguage) {
+      setLocale(savedLanguage, false);
+    }
+  }, []);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
