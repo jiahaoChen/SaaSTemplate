@@ -1,4 +1,15 @@
 export default {
+  'pages.landing.title': 'Build Amazing SaaS',
+  'pages.landing.subtitle': 'In Record Time',
+  'pages.landing.description': 'The complete SaaS template with React, Ant Design, FastAPI, and PostgreSQL. Everything you need to launch your next big idea.',
+  'pages.landing.getStarted': 'Get Started Free',
+  'pages.landing.signIn': 'Sign In',
+  'pages.landing.features.title': 'Everything You Need',
+  'pages.landing.features.description': 'Our comprehensive SaaS template includes all the essential features to build and scale your application.',
+  'pages.landing.cta.title': 'Ready to Build Something Amazing?',
+  'pages.landing.cta.description': 'Join thousands of developers and startups who have chosen our SaaS template to build their next successful application.',
+  'pages.landing.cta.trial': 'Start Free Trial',
+  'pages.landing.cta.demo': 'View Demo',
   'pages.layouts.userLayout.title':
     'Ant Design is the most influential web design specification in Xihu district',
   'pages.login.accountLogin.tab': 'Account Login',

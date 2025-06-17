@@ -258,8 +258,13 @@ export default [
     ],
   },
   {
+    path: '/landing',
+    layout: false,
+    component: './Landing',
+  },
+  {
     path: '/',
-    redirect: '/dashboard/analysis',
+    component: './AuthCheck',
   },
   {
     component: '404',

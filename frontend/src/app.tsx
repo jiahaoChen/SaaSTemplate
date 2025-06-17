@@ -11,6 +11,7 @@ import { ConfigProvider, theme } from 'antd';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+const landingPath = '/landing';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -35,9 +36,9 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
-  // 如果不是登录页面，执行
+  // 如果不是登录页面或landing页面，执行
   const { location } = history;
-  if (![loginPath, '/user/register', '/user/register-result'].includes(location.pathname)) {
+  if (![loginPath, '/user/register', '/user/register-result', landingPath].includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -54,7 +55,7 @@ export async function getInitialState(): Promise<{
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
+    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" isDark={initialState?.settings?.navTheme === 'realDark'} />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -68,9 +69,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
-      // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
+      // 如果没有登录，重定向到 landing page
+      if (!initialState?.currentUser &&
+          ![loginPath, '/user/register', '/user/register-result', landingPath].includes(location.pathname)) {
+        history.push(landingPath);
       }
     },
     bgLayoutImgList: [
