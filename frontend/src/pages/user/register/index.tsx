@@ -12,10 +12,11 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, Helmet, useIntl, Link, history } from '@umijs/max';
 import { SelectLang as CustomSelectLang } from '@/components';
-import { Alert, message, ConfigProvider, theme, Button } from 'antd';
+import { Alert, message, Button } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SignupStateType {
   status?: string;
@@ -117,23 +118,9 @@ const SignupMessage: React.FC<{
 
 const Signup: React.FC = () => {
   const [userSignupState, setUserSignupState] = useState<SignupStateType>({});
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const { styles } = useStyles(isDarkMode);
   const intl = useIntl();
-
-  // Initialize dark mode from localStorage
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('signup-dark-mode');
-    if (savedDarkMode !== null) {
-      setIsDarkMode(savedDarkMode === 'true');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('signup-dark-mode', newDarkMode.toString());
-  };
 
   const handleSubmit = async (values: any) => {
     try {
@@ -180,202 +167,196 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
-      }}
-    >
-      <div className={styles.container}>
-        <Helmet>
-          <title>
-            {intl.formatMessage({
+    <div className={styles.container}>
+      <Helmet>
+        <title>
+          {intl.formatMessage({
+            id: 'pages.signup.title',
+            defaultMessage: 'Create Account',
+          })}
+          {` - ${Settings.title}`}
+        </title>
+      </Helmet>
+
+      {/* Top right controls */}
+      <div className={styles.topRightIcons}>
+        <Lang isDark={isDarkMode} />
+        <Button
+          className={styles.darkModeToggle}
+          type="text"
+          icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+          onClick={toggleTheme}
+          style={{
+            color: isDarkMode ? 'white' : undefined,
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          flex: '1',
+          padding: '32px 0',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div className={styles.loginFormContainer}>
+          <LoginForm
+            contentStyle={{
+              minWidth: 280,
+              maxWidth: '75vw',
+            }}
+            logo={<img alt="logo" src="/logo.svg" />}
+            title={intl.formatMessage({
               id: 'pages.signup.title',
               defaultMessage: 'Create Account',
             })}
-            {` - ${Settings.title}`}
-          </title>
-        </Helmet>
-
-        {/* Top right controls */}
-        <div className={styles.topRightIcons}>
-          <Lang isDark={isDarkMode} />
-          <Button
-            className={styles.darkModeToggle}
-            type="text"
-            icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
-            onClick={toggleDarkMode}
-            style={{
-              color: isDarkMode ? 'white' : undefined,
+            subTitle={intl.formatMessage({
+              id: 'pages.signup.subtitle',
+              defaultMessage: 'Join us today!',
+            })}
+            onFinish={async (values) => {
+              await handleSubmit(values);
             }}
-          />
-        </div>
+            submitter={{
+              searchConfig: {
+                submitText: intl.formatMessage({
+                  id: 'pages.signup.submit',
+                  defaultMessage: 'Sign Up',
+                }),
+              },
+            }}
+          >
+            {userSignupState.status === 'error' && (
+              <SignupMessage
+                content={intl.formatMessage({
+                  id: 'pages.signup.failure',
+                  defaultMessage: 'Registration failed, please try again!',
+                })}
+              />
+            )}
 
-        <div
-          style={{
-            flex: '1',
-            padding: '32px 0',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <div className={styles.loginFormContainer}>
-            <LoginForm
-              contentStyle={{
-                minWidth: 280,
-                maxWidth: '75vw',
+            <ProFormText
+              name="email"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.action} />,
               }}
-              logo={<img alt="logo" src="/logo.svg" />}
-              title={intl.formatMessage({
-                id: 'pages.signup.title',
-                defaultMessage: 'Create Account',
+              placeholder={intl.formatMessage({
+                id: 'pages.signup.email.placeholder',
+                defaultMessage: 'Email address',
               })}
-              subTitle={intl.formatMessage({
-                id: 'pages.signup.subtitle',
-                defaultMessage: 'Join us today!',
-              })}
-              onFinish={async (values) => {
-                await handleSubmit(values);
-              }}
-              submitter={{
-                searchConfig: {
-                  submitText: intl.formatMessage({
-                    id: 'pages.signup.submit',
-                    defaultMessage: 'Sign Up',
-                  }),
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.signup.email.required"
+                      defaultMessage="Please input your email address!"
+                    />
+                  ),
                 },
+                {
+                  type: 'email',
+                  message: (
+                    <FormattedMessage
+                      id="pages.signup.email.invalid"
+                      defaultMessage="Please enter a valid email address!"
+                    />
+                  ),
+                },
+              ]}
+            />
+
+            <ProFormText.Password
+              name="password"
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined className={styles.action} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.signup.password.placeholder',
+                defaultMessage: 'Password',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.signup.password.required"
+                      defaultMessage="Please input your password!"
+                    />
+                  ),
+                },
+                {
+                  min: 8,
+                  message: (
+                    <FormattedMessage
+                      id="pages.signup.password.min"
+                      defaultMessage="Password must be at least 8 characters long!"
+                    />
+                  ),
+                },
+              ]}
+            />
+
+            <ProFormText.Password
+              name="confirmPassword"
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined className={styles.action} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.signup.confirmPassword.placeholder',
+                defaultMessage: 'Confirm password',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.signup.confirmPassword.required"
+                      defaultMessage="Please confirm your password!"
+                    />
+                  ),
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error(
+                        intl.formatMessage({
+                          id: 'pages.signup.confirmPassword.match',
+                          defaultMessage: 'Passwords do not match!',
+                        })
+                      )
+                    );
+                  },
+                }),
+              ]}
+            />
+
+            <div
+              style={{
+                marginBottom: 24,
+                textAlign: 'center',
               }}
             >
-              {userSignupState.status === 'error' && (
-                <SignupMessage
-                  content={intl.formatMessage({
-                    id: 'pages.signup.failure',
-                    defaultMessage: 'Registration failed, please try again!',
-                  })}
+              <Link to="/user/login" className={styles.darkText}>
+                <FormattedMessage
+                  id="pages.signup.loginAccount"
+                  defaultMessage="Already have an account? Sign in"
                 />
-              )}
-
-              <ProFormText
-                name="email"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined className={styles.action} />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.signup.email.placeholder',
-                  defaultMessage: 'Email address',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.signup.email.required"
-                        defaultMessage="Please input your email address!"
-                      />
-                    ),
-                  },
-                  {
-                    type: 'email',
-                    message: (
-                      <FormattedMessage
-                        id="pages.signup.email.invalid"
-                        defaultMessage="Please enter a valid email address!"
-                      />
-                    ),
-                  },
-                ]}
-              />
-
-              <ProFormText.Password
-                name="password"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined className={styles.action} />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.signup.password.placeholder',
-                  defaultMessage: 'Password',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.signup.password.required"
-                        defaultMessage="Please input your password!"
-                      />
-                    ),
-                  },
-                  {
-                    min: 8,
-                    message: (
-                      <FormattedMessage
-                        id="pages.signup.password.min"
-                        defaultMessage="Password must be at least 8 characters long!"
-                      />
-                    ),
-                  },
-                ]}
-              />
-
-              <ProFormText.Password
-                name="confirmPassword"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined className={styles.action} />,
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.signup.confirmPassword.placeholder',
-                  defaultMessage: 'Confirm password',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.signup.confirmPassword.required"
-                        defaultMessage="Please confirm your password!"
-                      />
-                    ),
-                  },
-                  ({ getFieldValue }) => ({
-                    validator(_, value) {
-                      if (!value || getFieldValue('password') === value) {
-                        return Promise.resolve();
-                      }
-                      return Promise.reject(
-                        new Error(
-                          intl.formatMessage({
-                            id: 'pages.signup.confirmPassword.match',
-                            defaultMessage: 'Passwords do not match!',
-                          })
-                        )
-                      );
-                    },
-                  }),
-                ]}
-              />
-
-              <div
-                style={{
-                  marginBottom: 24,
-                  textAlign: 'center',
-                }}
-              >
-                <Link to="/user/login" className={styles.darkText}>
-                  <FormattedMessage
-                    id="pages.signup.loginAccount"
-                    defaultMessage="Already have an account? Sign in"
-                  />
-                </Link>
-              </div>
-            </LoginForm>
-          </div>
+              </Link>
+            </div>
+          </LoginForm>
         </div>
-        <Footer />
       </div>
-    </ConfigProvider>
+      <Footer />
+    </div>
   );
 };
 

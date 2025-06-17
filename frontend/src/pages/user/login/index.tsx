@@ -15,11 +15,12 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, Helmet, useIntl, useModel, Link } from '@umijs/max';
 import { SelectLang as CustomSelectLang } from '@/components';
-import { Alert, message, ConfigProvider, theme, Button } from 'antd';
+import { Alert, message, Button } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LoginStateType extends Partial<API.Token> {
   status?: string;
@@ -132,27 +133,10 @@ const LoginMessage: React.FC<{
 
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<LoginStateType>({});
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles(isDarkMode);
   const intl = useIntl();
-
-  // Initialize dark mode from localStorage or global settings
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('login-dark-mode');
-    if (savedDarkMode !== null) {
-      setIsDarkMode(savedDarkMode === 'true');
-    } else {
-      // Fallback to global settings
-      setIsDarkMode(initialState?.settings?.navTheme === 'realDark');
-    }
-  }, [initialState?.settings?.navTheme]);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('login-dark-mode', newDarkMode.toString());
-  };
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -204,163 +188,151 @@ const Login: React.FC = () => {
   const { status } = userLoginState;
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        token: {
-          colorBgBase: isDarkMode ? '#141414' : '#ffffff',
-          colorTextBase: isDarkMode ? '#ffffff' : '#000000',
-          colorText: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
-          colorBorder: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : '#d9d9d9',
-        },
-      }}
-    >
-      <div className={styles.container}>
-        <Helmet>
-          <title>{` ${Settings.title || ''}`}</title>
-        </Helmet>
+    <div className={styles.container}>
+      <Helmet>
+        <title>{` ${Settings.title || ''}`}</title>
+      </Helmet>
 
-        <div className={styles.topRightIcons}>
-          {/* Dark Mode Toggle */}
-          <Button
-            className={styles.darkModeToggle}
-            type="text"
-            icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
-            onClick={toggleDarkMode}
-            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            style={{ color: isDarkMode ? 'white' : undefined }}
-          />
+      <div className={styles.topRightIcons}>
+        {/* Dark Mode Toggle */}
+        <Button
+          className={styles.darkModeToggle}
+          type="text"
+          icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+          onClick={toggleTheme}
+          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          style={{ color: isDarkMode ? 'white' : undefined }}
+        />
 
-          <Lang isDark={isDarkMode} />
-        </div>
+        <Lang isDark={isDarkMode} />
+      </div>
 
-        <div
-          style={{
-            flex: '1',
-            padding: '32px 0',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <div className={styles.loginFormContainer} style={{ padding: '40px' }}>
-            <LoginForm
-              contentStyle={{
-                minWidth: 280,
-                maxWidth: '75vw',
-                backgroundColor: 'transparent',
+      <div
+        style={{
+          flex: '1',
+          padding: '32px 0',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div className={styles.loginFormContainer} style={{ padding: '40px' }}>
+          <LoginForm
+            contentStyle={{
+              minWidth: 280,
+              maxWidth: '75vw',
+              backgroundColor: 'transparent',
+            }}
+            logo={<img alt="logo" src="/logo.svg" />}
+            title={<span style={{ color: isDarkMode ? 'white' : undefined }}>Ant Design</span>}
+            subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+            initialValues={{
+              autoLogin: true,
+            }}
+            actions={[
+              <span key="loginWith" className={styles.darkText}>
+                <FormattedMessage
+                  id="pages.login.loginWith"
+                  defaultMessage="其他登录方式"
+                />
+              </span>,
+              <ActionIcons key="icons" isDark={isDarkMode} />,
+            ]}
+            onFinish={async (values) => {
+              await handleSubmit(values as API.BodyLoginLoginAccessToken);
+            }}
+          >
+            {status === 'error' && (
+              <LoginMessage
+                content={intl.formatMessage({
+                  id: 'pages.login.accountLogin.errorMessage',
+                  defaultMessage: '账户或密码错误(admin/ant.design)',
+                })}
+              />
+            )}
+            <ProFormText
+              name="username"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined />,
+                style: { color: isDarkMode ? 'white' : undefined },
               }}
-              logo={<img alt="logo" src="/logo.svg" />}
-              title={<span style={{ color: isDarkMode ? 'white' : undefined }}>Ant Design</span>}
-              subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
-              initialValues={{
-                autoLogin: true,
-              }}
-              actions={[
-                <span key="loginWith" className={styles.darkText}>
-                  <FormattedMessage
-                    id="pages.login.loginWith"
-                    defaultMessage="其他登录方式"
-                  />
-                </span>,
-                <ActionIcons key="icons" isDark={isDarkMode} />,
+              placeholder={intl.formatMessage({
+                id: 'pages.login.username.placeholder',
+                defaultMessage: '用户名: admin or user',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.login.username.required"
+                      defaultMessage="请输入用户名!"
+                    />
+                  ),
+                },
               ]}
-              onFinish={async (values) => {
-                await handleSubmit(values as API.BodyLoginLoginAccessToken);
+            />
+            <ProFormText.Password
+              name="password"
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined />,
+                style: { color: isDarkMode ? 'white' : undefined },
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.password.placeholder',
+                defaultMessage: '',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.login.password.required"
+                      defaultMessage="请输入密码！"
+                    />
+                  ),
+                },
+              ]}
+            />
+            <div
+              style={{
+                marginBottom: 24,
               }}
             >
-              {status === 'error' && (
-                <LoginMessage
-                  content={intl.formatMessage({
-                    id: 'pages.login.accountLogin.errorMessage',
-                    defaultMessage: '账户或密码错误(admin/ant.design)',
-                  })}
+              <ProFormCheckbox noStyle name="autoLogin">
+                <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
+              </ProFormCheckbox>
+              <a
+                style={{
+                  float: 'right',
+                }}
+              >
+                <FormattedMessage
+                  id="pages.login.forgotPassword"
+                  defaultMessage="忘记密码"
                 />
-              )}
-              <ProFormText
-                name="username"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined />,
-                  style: { color: isDarkMode ? 'white' : undefined },
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.username.required"
-                        defaultMessage="请输入用户名!"
-                      />
-                    ),
-                  },
-                ]}
-              />
-              <ProFormText.Password
-                name="password"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined />,
-                  style: { color: isDarkMode ? 'white' : undefined },
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.password.placeholder',
-                  defaultMessage: '',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.password.required"
-                        defaultMessage="请输入密码！"
-                      />
-                    ),
-                  },
-                ]}
-              />
-              <div
-                style={{
-                  marginBottom: 24,
-                }}
-              >
-                <ProFormCheckbox noStyle name="autoLogin">
-                  <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
-                </ProFormCheckbox>
-                <a
-                  style={{
-                    float: 'right',
-                  }}
-                >
-                  <FormattedMessage
-                    id="pages.login.forgotPassword"
-                    defaultMessage="忘记密码"
-                  />
-                </a>
-              </div>
-              <div
-                style={{
-                  marginBottom: 24,
-                  textAlign: 'center',
-                }}
-              >
-                <Link to="/user/register" className={styles.darkText}>
-                  <FormattedMessage
-                    id="pages.login.registerAccount"
-                    defaultMessage="Register Account"
-                  />
-                </Link>
-              </div>
-            </LoginForm>
-          </div>
+              </a>
+            </div>
+            <div
+              style={{
+                marginBottom: 24,
+                textAlign: 'center',
+              }}
+            >
+              <Link to="/user/register" className={styles.darkText}>
+                <FormattedMessage
+                  id="pages.login.registerAccount"
+                  defaultMessage="Register Account"
+                />
+              </Link>
+            </div>
+          </LoginForm>
         </div>
-        <Footer />
       </div>
-    </ConfigProvider>
+      <Footer />
+    </div>
   );
 };
 

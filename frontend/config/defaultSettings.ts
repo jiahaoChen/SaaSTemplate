@@ -7,7 +7,6 @@ const Settings: ProLayoutProps & {
   pwa?: boolean;
   logo?: string;
 } = {
-  "navTheme": "realDark",
   "colorPrimary": "#1890ff",
   "layout": "side",
   "contentWidth": "Fluid",
