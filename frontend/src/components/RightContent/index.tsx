@@ -3,8 +3,8 @@ import { SelectLang as UmiSelectLang } from '@umijs/max';
 
 export type SiderTheme = 'light' | 'dark';
 
-export const SelectLang = () => {
-  return <UmiSelectLang />;
+export const SelectLang = ({ isDark }: { isDark: boolean }) => {
+  return <UmiSelectLang style={{ color: isDark ? 'white' : undefined }} />;
 };
 
 export const Question = () => {

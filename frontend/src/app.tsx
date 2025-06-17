@@ -7,6 +7,8 @@ import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { usersReadUserMe as queryCurrentUser } from './services/ant-design-pro/users';
+import { ConfigProvider, theme } from 'antd';
+
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -106,7 +108,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
-        <>
+        <ConfigProvider
+          theme={{
+            algorithm: initialState?.settings?.navTheme === 'realDark' ? theme.darkAlgorithm : undefined,
+          }}
+        >
           {children}
           {isDev && (
             <SettingDrawer
@@ -121,7 +127,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               }}
             />
           )}
-        </>
+        </ConfigProvider>
       );
     },
     ...initialState?.settings,
