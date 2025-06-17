@@ -1,292 +1,382 @@
-import { history, Link, useRequest } from '@umijs/max';
-import { Button, Col, Form, Input, message, Popover, Progress, Row, Select, Space } from 'antd';
-import type { Store } from 'antd/es/form/interface';
-import type { FC } from 'react';
-import { useEffect, useState } from 'react';
-import type { StateType } from './service';
-import { fakeRegister } from './service';
-import useStyles from './style.style';
+import { Footer } from '@/components';
+import { usersRegisterUser as signup } from '@/services/ant-design-pro/users';
+import {
+  LockOutlined,
+  UserOutlined,
+  BulbOutlined,
+  BulbFilled,
+} from '@ant-design/icons';
+import {
+  LoginForm,
+  ProFormText,
+} from '@ant-design/pro-components';
+import { FormattedMessage, Helmet, useIntl, Link, history } from '@umijs/max';
+import { SelectLang as CustomSelectLang } from '@/components';
+import { Alert, message, ConfigProvider, theme, Button } from 'antd';
+import { createStyles } from 'antd-style';
+import React, { useState, useEffect } from 'react';
+import Settings from '../../../../config/defaultSettings';
 
-const FormItem = Form.Item;
-const { Option } = Select;
+interface SignupStateType {
+  status?: string;
+}
 
-const passwordProgressMap: {
-  ok: 'success';
-  pass: 'normal';
-  poor: 'exception';
-} = {
-  ok: 'success',
-  pass: 'normal',
-  poor: 'exception',
-};
-const Register: FC = () => {
-  const { styles } = useStyles();
-  const [count, setCount]: [number, any] = useState(0);
-  const [open, setVisible]: [boolean, any] = useState(false);
-  const [prefix, setPrefix]: [string, any] = useState('86');
-  const [popover, setPopover]: [boolean, any] = useState(false);
-  const confirmDirty = false;
-  let interval: number | undefined;
-
-  const passwordStatusMap = {
-    ok: (
-      <div className={styles.success}>
-        <span>强度：强</span>
-      </div>
-    ),
-    pass: (
-      <div className={styles.warning}>
-        <span>强度：中</span>
-      </div>
-    ),
-    poor: (
-      <div className={styles.error}>
-        <span>强度：太短</span>
-      </div>
-    ),
-  };
-
-  const [form] = Form.useForm();
-  useEffect(
-    () => () => {
-      clearInterval(interval);
+const useStyles = createStyles(({ token }, isDark: boolean) => {
+  return {
+    action: {
+      marginLeft: '8px',
+      fontSize: '24px',
+      verticalAlign: 'middle',
+      cursor: 'pointer',
+      transition: 'color 0.3s',
+      '&:hover': {
+        color: token.colorPrimaryActive,
+      },
     },
-    [interval],
-  );
-  const onGetCaptcha = () => {
-    let counts = 59;
-    setCount(counts);
-    interval = window.setInterval(() => {
-      counts -= 1;
-      setCount(counts);
-      if (counts === 0) {
-        clearInterval(interval);
-      }
-    }, 1000);
-  };
-  const getPasswordStatus = () => {
-    const value = form.getFieldValue('password');
-    if (value && value.length > 9) {
-      return 'ok';
-    }
-    if (value && value.length > 5) {
-      return 'pass';
-    }
-    return 'poor';
-  };
-  const { loading: submitting, run: register } = useRequest<{
-    data: StateType;
-  }>(fakeRegister, {
-    manual: true,
-    onSuccess: (data, params) => {
-      if (data.status === 'ok') {
-        message.success('注册成功！');
-        history.push({
-          pathname: `/user/register-result?account=${params[0].email}`,
-        });
-      }
+    lang: {
+      width: 42,
+      height: 42,
+      lineHeight: '42px',
+      borderRadius: token.borderRadius,
+      ':hover': {
+        backgroundColor: token.colorBgTextHover,
+      },
+      color: isDark ? 'white' : undefined,
+      '.anticon': {
+        color: isDark ? 'white' : undefined,
+      },
+      '.ant-dropdown-trigger': {
+        color: isDark ? 'white' : undefined,
+      },
     },
-  });
-  const onFinish = (values: Store) => {
-    register(values);
+    darkModeToggle: {
+      zIndex: 1000,
+      borderRadius: '50%',
+      width: 42,
+      height: 42,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 8,
+    },
+    container: {
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'auto',
+      backgroundImage: isDark
+        ? "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg')"
+        : "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+      backgroundSize: '100% 100%',
+      backgroundColor: isDark ? '#141414' : '#f0f2f5',
+    },
+    loginFormContainer: {
+      backgroundColor: isDark ? 'rgba(20, 20, 20, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+      borderRadius: token.borderRadius,
+      backdropFilter: 'blur(10px)',
+      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.06)',
+    },
+    darkText: {
+      color: isDark ? 'white' : undefined,
+    },
+    topRightIcons: {
+      display: 'flex',
+      alignItems: 'center',
+      position: 'fixed',
+      top: 16,
+      right: 16,
+      zIndex: 1000,
+    },
   };
-  const checkConfirm = (_: any, value: string) => {
-    const promise = Promise;
-    if (value && value !== form.getFieldValue('password')) {
-      return promise.reject('两次输入的密码不匹配!');
-    }
-    return promise.resolve();
-  };
-  const checkPassword = (_: any, value: string) => {
-    const promise = Promise;
-    // 没有值的情况
-    if (!value) {
-      setVisible(!!value);
-      return promise.reject('请输入密码!');
-    }
-    // 有值的情况
-    if (!open) {
-      setVisible(!!value);
-    }
-    setPopover(!popover);
-    if (value.length < 6) {
-      return promise.reject('');
-    }
-    if (value && confirmDirty) {
-      form.validateFields(['confirm']);
-    }
-    return promise.resolve();
-  };
-  const changePrefix = (value: string) => {
-    setPrefix(value);
-  };
-  const renderPasswordProgress = () => {
-    const value = form.getFieldValue('password');
-    const passwordStatus = getPasswordStatus();
-    return value && value.length ? (
-      <div className={styles[`progress-${passwordStatus}`]}>
-        <Progress
-          status={passwordProgressMap[passwordStatus]}
-          strokeWidth={6}
-          percent={value.length * 10 > 100 ? 100 : value.length * 10}
-          showInfo={false}
-        />
-      </div>
-    ) : null;
-  };
+});
+
+const Lang = ({ isDark }: { isDark: boolean }) => {
+  const { styles } = useStyles(isDark);
+
   return (
-    <div className={styles.main}>
-      <h3>注册</h3>
-      <Form form={form} name="UserRegister" onFinish={onFinish}>
-        <FormItem
-          name="email"
-          rules={[
-            {
-              required: true,
-              message: '请输入邮箱地址!',
-            },
-            {
-              type: 'email',
-              message: '邮箱地址格式错误!',
-            },
-          ]}
-        >
-          <Input size="large" placeholder="邮箱" />
-        </FormItem>
-        <Popover
-          getPopupContainer={(node) => {
-            if (node && node.parentNode) {
-              return node.parentNode as HTMLElement;
-            }
-            return node;
-          }}
-          content={
-            open && (
-              <div
-                style={{
-                  padding: '4px 0',
-                }}
-              >
-                {passwordStatusMap[getPasswordStatus()]}
-                {renderPasswordProgress()}
-                <div
-                  style={{
-                    marginTop: 10,
-                  }}
-                >
-                  <span>请至少输入 6 个字符。请不要使用容易被猜到的密码。</span>
-                </div>
-              </div>
-            )
-          }
-          overlayStyle={{
-            width: 240,
-          }}
-          placement="right"
-          open={open}
-        >
-          <FormItem
-            name="password"
-            className={
-              form.getFieldValue('password') &&
-              form.getFieldValue('password').length > 0 &&
-              styles.password
-            }
-            rules={[
-              {
-                validator: checkPassword,
-              },
-            ]}
-          >
-            <Input size="large" type="password" placeholder="至少6位密码，区分大小写" />
-          </FormItem>
-        </Popover>
-        <FormItem
-          name="confirm"
-          rules={[
-            {
-              required: true,
-              message: '确认密码',
-            },
-            {
-              validator: checkConfirm,
-            },
-          ]}
-        >
-          <Input size="large" type="password" placeholder="确认密码" />
-        </FormItem>
-        <FormItem
-          name="mobile"
-          rules={[
-            {
-              required: true,
-              message: '请输入手机号!',
-            },
-            {
-              pattern: /^\d{11}$/,
-              message: '手机号格式错误!',
-            },
-          ]}
-        >
-          <Space.Compact style={{ width: '100%' }}>
-            <Select
-              size="large"
-              value={prefix}
-              onChange={changePrefix}
-              style={{
-                width: '30%',
-              }}
-            >
-              <Option value="86">+86</Option>
-              <Option value="87">+87</Option>
-            </Select>
-
-            <Input size="large" placeholder="手机号" />
-          </Space.Compact>
-        </FormItem>
-        <Row gutter={8}>
-          <Col span={16}>
-            <FormItem
-              name="captcha"
-              rules={[
-                {
-                  required: true,
-                  message: '请输入验证码!',
-                },
-              ]}
-            >
-              <Input size="large" placeholder="验证码" />
-            </FormItem>
-          </Col>
-          <Col span={8}>
-            <Button
-              size="large"
-              disabled={!!count}
-              className={styles.getCaptcha}
-              onClick={onGetCaptcha}
-            >
-              {count ? `${count} s` : '获取验证码'}
-            </Button>
-          </Col>
-        </Row>
-        <FormItem>
-          <div className={styles.footer}>
-            <Button
-              size="large"
-              loading={submitting}
-              className={styles.submit}
-              type="primary"
-              htmlType="submit"
-            >
-              <span>注册</span>
-            </Button>
-            <Link to="/user/login">
-              <span>使用已有账户登录</span>
-            </Link>
-          </div>
-        </FormItem>
-      </Form>
+    <div className={styles.lang} data-lang>
+      {CustomSelectLang && <CustomSelectLang isDark={isDark} />}
     </div>
   );
 };
-export default Register;
+
+const SignupMessage: React.FC<{
+  content: string;
+}> = ({ content }) => {
+  return (
+    <Alert
+      style={{
+        marginBottom: 24,
+      }}
+      message={content}
+      type="error"
+      showIcon
+    />
+  );
+};
+
+const Signup: React.FC = () => {
+  const [userSignupState, setUserSignupState] = useState<SignupStateType>({});
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const { styles } = useStyles(isDarkMode);
+  const intl = useIntl();
+
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('signup-dark-mode');
+    if (savedDarkMode !== null) {
+      setIsDarkMode(savedDarkMode === 'true');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    localStorage.setItem('signup-dark-mode', newDarkMode.toString());
+  };
+
+  const handleSubmit = async (values: any) => {
+    try {
+      // Create account
+      const response = await signup({
+        email: values.email,
+        password: values.password,
+        full_name: values.email, // Use email as full_name for simplicity
+      });
+
+      if (response) {
+        const defaultSignupSuccessMessage = intl.formatMessage({
+          id: 'pages.signup.success',
+          defaultMessage: 'Account created successfully!',
+        });
+        message.success(defaultSignupSuccessMessage);
+
+        // Redirect to login page after successful signup
+        history.push('/user/login');
+        return;
+      }
+
+      // If we get here, signup failed
+      setUserSignupState({ status: 'error' });
+    } catch (error: any) {
+      console.log('Signup error:', error);
+
+      let errorMessage = intl.formatMessage({
+        id: 'pages.signup.failure',
+        defaultMessage: 'Registration failed, please try again!',
+      });
+
+      // Check for specific error messages
+      if (error?.response?.data?.detail === 'The user with this email already exists in the system') {
+        errorMessage = intl.formatMessage({
+          id: 'pages.signup.existsError',
+          defaultMessage: 'An account with this email already exists!',
+        });
+      }
+
+      message.error(errorMessage);
+      setUserSignupState({ status: 'error' });
+    }
+  };
+
+  return (
+    <ConfigProvider
+      theme={{
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      }}
+    >
+      <div className={styles.container}>
+        <Helmet>
+          <title>
+            {intl.formatMessage({
+              id: 'pages.signup.title',
+              defaultMessage: 'Create Account',
+            })}
+            {` - ${Settings.title}`}
+          </title>
+        </Helmet>
+
+        {/* Top right controls */}
+        <div className={styles.topRightIcons}>
+          <Lang isDark={isDarkMode} />
+          <Button
+            className={styles.darkModeToggle}
+            type="text"
+            icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+            onClick={toggleDarkMode}
+            style={{
+              color: isDarkMode ? 'white' : undefined,
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            flex: '1',
+            padding: '32px 0',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <div className={styles.loginFormContainer}>
+            <LoginForm
+              contentStyle={{
+                minWidth: 280,
+                maxWidth: '75vw',
+              }}
+              logo={<img alt="logo" src="/logo.svg" />}
+              title={intl.formatMessage({
+                id: 'pages.signup.title',
+                defaultMessage: 'Create Account',
+              })}
+              subTitle={intl.formatMessage({
+                id: 'pages.signup.subtitle',
+                defaultMessage: 'Join us today!',
+              })}
+              onFinish={async (values) => {
+                await handleSubmit(values);
+              }}
+              submitter={{
+                searchConfig: {
+                  submitText: intl.formatMessage({
+                    id: 'pages.signup.submit',
+                    defaultMessage: 'Sign Up',
+                  }),
+                },
+              }}
+            >
+              {userSignupState.status === 'error' && (
+                <SignupMessage
+                  content={intl.formatMessage({
+                    id: 'pages.signup.failure',
+                    defaultMessage: 'Registration failed, please try again!',
+                  })}
+                />
+              )}
+
+              <ProFormText
+                name="email"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined className={styles.action} />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.signup.email.placeholder',
+                  defaultMessage: 'Email address',
+                })}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.signup.email.required"
+                        defaultMessage="Please input your email address!"
+                      />
+                    ),
+                  },
+                  {
+                    type: 'email',
+                    message: (
+                      <FormattedMessage
+                        id="pages.signup.email.invalid"
+                        defaultMessage="Please enter a valid email address!"
+                      />
+                    ),
+                  },
+                ]}
+              />
+
+              <ProFormText.Password
+                name="password"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined className={styles.action} />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.signup.password.placeholder',
+                  defaultMessage: 'Password',
+                })}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.signup.password.required"
+                        defaultMessage="Please input your password!"
+                      />
+                    ),
+                  },
+                  {
+                    min: 8,
+                    message: (
+                      <FormattedMessage
+                        id="pages.signup.password.min"
+                        defaultMessage="Password must be at least 8 characters long!"
+                      />
+                    ),
+                  },
+                ]}
+              />
+
+              <ProFormText.Password
+                name="confirmPassword"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined className={styles.action} />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.signup.confirmPassword.placeholder',
+                  defaultMessage: 'Confirm password',
+                })}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.signup.confirmPassword.required"
+                        defaultMessage="Please confirm your password!"
+                      />
+                    ),
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          intl.formatMessage({
+                            id: 'pages.signup.confirmPassword.match',
+                            defaultMessage: 'Passwords do not match!',
+                          })
+                        )
+                      );
+                    },
+                  }),
+                ]}
+              />
+
+              <div
+                style={{
+                  marginBottom: 24,
+                  textAlign: 'center',
+                }}
+              >
+                <Link to="/user/login" className={styles.darkText}>
+                  <FormattedMessage
+                    id="pages.signup.loginAccount"
+                    defaultMessage="Already have an account? Sign in"
+                  />
+                </Link>
+              </div>
+            </LoginForm>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    </ConfigProvider>
+  );
+};
+
+export default Signup;

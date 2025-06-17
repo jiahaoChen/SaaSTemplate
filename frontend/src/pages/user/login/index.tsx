@@ -1,20 +1,19 @@
 import { Footer } from '@/components';
 import { loginLoginAccessToken as login } from '@/services/ant-design-pro/login';
 import {
-  AlipayCircleOutlined,
   LockOutlined,
-  TaobaoCircleOutlined,
+  FacebookOutlined,
   UserOutlined,
-  WeiboCircleOutlined,
   BulbOutlined,
   BulbFilled,
 } from '@ant-design/icons';
+import GoogleColorIcon from '@/components/icons/GoogleColorIcon';
 import {
   LoginForm,
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { FormattedMessage, Helmet, useIntl, useModel } from '@umijs/max';
+import { FormattedMessage, Helmet, useIntl, useModel, Link } from '@umijs/max';
 import { SelectLang as CustomSelectLang } from '@/components';
 import { Alert, message, ConfigProvider, theme, Button } from 'antd';
 import { createStyles } from 'antd-style';
@@ -30,7 +29,6 @@ const useStyles = createStyles(({ token }, isDark: boolean) => {
   return {
     action: {
       marginLeft: '8px',
-      color: isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.2)',
       fontSize: '24px',
       verticalAlign: 'middle',
       cursor: 'pointer',
@@ -101,9 +99,8 @@ const ActionIcons = ({ isDark }: { isDark: boolean }) => {
 
   return (
     <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
-      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
+      <GoogleColorIcon key="GoogleColorIcon" className={styles.action} />
+      <FacebookOutlined key="FacebookOutlined" className={styles.action} style={{ color: '#4267B2' }} />
     </>
   );
 };
@@ -344,6 +341,19 @@ const Login: React.FC = () => {
                     defaultMessage="忘记密码"
                   />
                 </a>
+              </div>
+              <div
+                style={{
+                  marginBottom: 24,
+                  textAlign: 'center',
+                }}
+              >
+                <Link to="/user/register" className={styles.darkText}>
+                  <FormattedMessage
+                    id="pages.login.registerAccount"
+                    defaultMessage="Register Account"
+                  />
+                </Link>
               </div>
             </LoginForm>
           </div>
