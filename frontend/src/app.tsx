@@ -1,19 +1,31 @@
 import { AvatarDropdown, AvatarName, Footer, Question, SelectLang } from '@/components';
-import { LinkOutlined } from '@ant-design/icons';
+import { LinkOutlined, GlobalOutlined, SunOutlined, MoonOutlined, SettingOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link } from '@umijs/max';
+import { history, Link, setLocale, getLocale } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { usersReadUserMe as queryCurrentUser } from './services/ant-design-pro/users';
-import { ConfigProvider, theme } from 'antd';
+import { ConfigProvider, theme, FloatButton, Dropdown, Space } from 'antd';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import React from 'react';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const landingPath = '/landing';
+
+// Language options
+const languageOptions = [
+  { key: 'en-US', label: 'English', flag: '🇺🇸' },
+  { key: 'zh-CN', label: '简体中文', flag: '🇨🇳' },
+  { key: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
+  { key: 'ja-JP', label: '日本語', flag: '🇯🇵' },
+  { key: 'pt-BR', label: 'Português', flag: '🇧🇷' },
+  { key: 'id-ID', label: 'Bahasa Indonesia', flag: '🇮🇩' },
+  { key: 'fa-IR', label: 'فارسی', flag: '🇮🇷' },
+  { key: 'bn-BD', label: 'বাংলা', flag: '🇧🇩' },
+];
 
 // A new component to wrap the main application content and apply the global theme
 const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,6 +38,54 @@ const AppWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     >
       {children}
     </ConfigProvider>
+  );
+};
+
+// Global FloatButton component
+const GlobalFloatButton: React.FC = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
+
+  const handleLanguageChange = ({ key }: { key: string }) => {
+    setLocale(key, false); // false to not reload page
+    localStorage.setItem('app-language', key);
+  };
+
+  const languageMenuItems = languageOptions.map(option => ({
+    key: option.key,
+    label: (
+      <Space>
+        <span>{option.flag}</span>
+        <span>{option.label}</span>
+      </Space>
+    ),
+  }));
+
+  return (
+    <FloatButton.Group
+      trigger="hover"
+      type="primary"
+      style={{ right: 24 }}
+      icon={<SettingOutlined />}
+    >
+      <FloatButton
+        icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+        tooltip="Toggle Theme"
+        onClick={toggleTheme}
+      />
+      <Dropdown
+        menu={{
+          items: languageMenuItems,
+          onClick: handleLanguageChange,
+          selectedKeys: [getLocale()],
+        }}
+        placement="bottomLeft"
+      >
+        <FloatButton
+          icon={<GlobalOutlined />}
+          tooltip="Change Language"
+        />
+      </Dropdown>
+    </FloatButton.Group>
   );
 };
 
@@ -140,6 +200,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <>
           {children}
+          <GlobalFloatButton />
           {isDev && (
             <SettingDrawer
               disableUrlParams

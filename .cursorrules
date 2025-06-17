@@ -957,3 +957,102 @@ data: formData.toString()
 - **CORS**: Configured for cross-origin requests between ports
 
 The SaaS template is now fully functional with working authentication! 🚀
+
+## Add FloatButton Design to Dashboard - ✅ COMPLETED
+
+**Task**: Add the FloatButton design from the Landing page to the dashboard in the right-bottom corner.
+
+**UPDATED REQUIREMENT**: The button should exist on all pages.
+
+**Requirements**:
+1. ✅ Use the same FloatButton.Group design from Landing page
+2. ✅ Include theme toggle (dark/light mode)
+3. ✅ Include language selector with all 8 languages
+4. ✅ Position in right-bottom corner
+5. ✅ Integrate with existing theme context and locale management
+6. ✅ **NEW**: Make it available on all pages globally
+
+**Implementation Summary**:
+
+### Global Implementation ✅
+✅ **Global FloatButton**: Moved from dashboard-specific to global layout in `frontend/src/app.tsx`
+✅ **Layout Integration**: Added `GlobalFloatButton` component to `childrenRender` function in ProLayout configuration
+✅ **All Pages Coverage**: Now appears on all pages that use ProLayout (excludes only login, register, landing pages)
+✅ **Cleanup**: Removed FloatButton code from dashboard analysis page to avoid duplication
+
+### What Was Added
+✅ **FloatButton.Group Component**: Now in global app layout (`frontend/src/app.tsx`)
+✅ **Theme Toggle**: Dark/light mode toggle using sun/moon icons with `useTheme` hook
+✅ **Language Selector**: 8-language dropdown with flag emojis (English, 简体中文, 繁體中文, 日本語, Português, Bahasa Indonesia, فارسی, বাংলা)
+✅ **Settings Icon**: Main FAB with settings gear icon that triggers on hover
+✅ **Positioning**: Fixed position in right-bottom corner with `style={{ right: 24 }}`
+
+### Imports Added to app.tsx
+✅ **Icons**: `GlobalOutlined`, `SunOutlined`, `MoonOutlined`, `SettingOutlined`
+✅ **Components**: `FloatButton`, `Dropdown`, `Space` from antd
+✅ **Hooks**: `setLocale`, `getLocale` from @umijs/max
+✅ **Context**: `useTheme` from theme context
+
+### Code Structure
+✅ **Language Options**: Array of 8 languages with keys, labels, and flag emojis
+✅ **Language Handler**: `handleLanguageChange` function for locale switching with localStorage persistence
+✅ **Menu Items**: Dynamic menu generation with flag + language name format
+✅ **Theme Integration**: Uses existing global theme context for dark/light mode
+✅ **Global Component**: `GlobalFloatButton` component rendered in layout's `childrenRender`
+
+### Key Features
+✅ **Hover Trigger**: FloatButton.Group expands on hover to show sub-buttons
+✅ **Tooltips**: Both theme toggle and language selector have helpful tooltips
+✅ **State Persistence**: Theme and language choices saved to localStorage
+✅ **Icon Switching**: Theme button shows sun icon in dark mode, moon icon in light mode
+✅ **Selected State**: Current language highlighted in dropdown menu
+✅ **Global Availability**: Available on all dashboard, settings, profile, and content pages
+
+### Technical Implementation
+✅ **Layout Integration**: Added to ProLayout `childrenRender` function in `app.tsx`
+✅ **Component Separation**: Created dedicated `GlobalFloatButton` component
+✅ **No Duplication**: Removed from individual pages to avoid conflicts
+✅ **Consistent Behavior**: Same functionality across all pages
+
+**Status**: 🎉 **GLOBAL IMPLEMENTATION COMPLETE** - FloatButton now available on all pages!
+
+**How to Test**:
+1. Start backend server: `cd backend && source .venv/bin/activate && fastapi run --reload app/main.py` (port 8000)
+2. Start frontend server: `cd frontend && npm start` (port 8001)
+3. Login and navigate to any page (dashboard, settings, profile, etc.)
+4. Look for FloatButton in bottom-right corner with settings icon
+5. Hover over it to see theme toggle and language selector expand
+6. Test theme switching between dark/light modes
+7. Test language switching with all 8 supported languages
+8. Navigate between different pages to verify it appears everywhere
+9. Verify both settings persist after page refresh and navigation
+
+**Pages Where FloatButton Appears**:
+- ✅ Dashboard (Analysis, Monitor, Workplace)
+- ✅ Account (Center, Settings)
+- ✅ Form pages (Basic, Advanced, Step)
+- ✅ List pages (Table List, Basic List, Card List)
+- ✅ Profile pages (Basic, Advanced)
+- ✅ All other authenticated pages
+
+**Pages Where FloatButton Does NOT Appear** (by design):
+- ❌ Landing page (has its own FloatButton)
+- ❌ Login page (has its own FloatButton)
+- ❌ Register page (has its own FloatButton)
+- ❌ 404/403/500 error pages
+
+**User Experience**:
+- ✅ **Consistent Design**: Matches the premium FloatButton design from Landing page
+- ✅ **Universal Access**: Quick access to theme and language settings from any page
+- ✅ **Visual Feedback**: Clear icons, tooltips, and hover states for better UX
+- ✅ **Non-intrusive**: Positioned in corner, only expands on hover
+- ✅ **Persistent Settings**: User preferences saved across sessions and pages
+- ✅ **No Conflicts**: Single global instance prevents duplication or conflicts
+
+**Architecture Benefits**:
+- ✅ **DRY Principle**: Single implementation instead of duplicating across pages
+- ✅ **Maintainability**: Changes only need to be made in one place
+- ✅ **Performance**: No redundant components on individual pages
+- ✅ **Consistency**: Identical behavior and appearance across the application
+
+---
