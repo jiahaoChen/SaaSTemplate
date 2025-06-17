@@ -3,24 +3,36 @@ import { usersRegisterUser as signup } from '@/services/ant-design-pro/users';
 import {
   LockOutlined,
   UserOutlined,
-  BulbOutlined,
-  BulbFilled,
+  SunOutlined,
+  GlobalOutlined,
+  MoonOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import {
   LoginForm,
   ProFormText,
 } from '@ant-design/pro-components';
-import { FormattedMessage, Helmet, useIntl, Link, history } from '@umijs/max';
-import { SelectLang as CustomSelectLang } from '@/components';
-import { Alert, message, Button } from 'antd';
+import { FormattedMessage, Helmet, useIntl, Link, history, setLocale, getLocale } from '@umijs/max';
+import { Alert, message, Dropdown, FloatButton, Space } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Settings from '../../../../config/defaultSettings';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface SignupStateType {
   status?: string;
 }
+
+const languageOptions = [
+  { key: 'en-US', label: 'English', flag: '🇺🇸' },
+  { key: 'zh-CN', label: '简体中文', flag: '🇨🇨' },
+  { key: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
+  { key: 'ja-JP', label: '日本語', flag: '🇯🇵' },
+  { key: 'pt-BR', label: 'Português', flag: '🇧🇷' },
+  { key: 'id-ID', label: 'Bahasa Indonesia', flag: '🇮🇩' },
+  { key: 'fa-IR', label: 'فارسی', flag: '🇮🇷' },
+  { key: 'bn-BD', label: 'বাংলা', flag: '🇧🇩' },
+];
 
 const useStyles = createStyles(({ token }, isDark: boolean) => {
   return {
@@ -33,32 +45,6 @@ const useStyles = createStyles(({ token }, isDark: boolean) => {
       '&:hover': {
         color: token.colorPrimaryActive,
       },
-    },
-    lang: {
-      width: 42,
-      height: 42,
-      lineHeight: '42px',
-      borderRadius: token.borderRadius,
-      ':hover': {
-        backgroundColor: token.colorBgTextHover,
-      },
-      color: isDark ? 'white' : undefined,
-      '.anticon': {
-        color: isDark ? 'white' : undefined,
-      },
-      '.ant-dropdown-trigger': {
-        color: isDark ? 'white' : undefined,
-      },
-    },
-    darkModeToggle: {
-      zIndex: 1000,
-      borderRadius: '50%',
-      width: 42,
-      height: 42,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginLeft: 8,
     },
     container: {
       display: 'flex',
@@ -80,26 +66,8 @@ const useStyles = createStyles(({ token }, isDark: boolean) => {
     darkText: {
       color: isDark ? 'white' : undefined,
     },
-    topRightIcons: {
-      display: 'flex',
-      alignItems: 'center',
-      position: 'fixed',
-      top: 16,
-      right: 16,
-      zIndex: 1000,
-    },
   };
 });
-
-const Lang = ({ isDark }: { isDark: boolean }) => {
-  const { styles } = useStyles(isDark);
-
-  return (
-    <div className={styles.lang} data-lang>
-      {CustomSelectLang && <CustomSelectLang isDark={isDark} />}
-    </div>
-  );
-};
 
 const SignupMessage: React.FC<{
   content: string;
@@ -121,6 +89,18 @@ const Signup: React.FC = () => {
   const { isDarkMode, toggleTheme } = useTheme();
   const { styles } = useStyles(isDarkMode);
   const intl = useIntl();
+
+  const handleLanguageChange = ({ key }: { key: string }) => {
+    setLocale(key, false); // false to not reload page
+    localStorage.setItem('app-language', key);
+  };
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('app-language');
+    if (savedLanguage) {
+      setLocale(savedLanguage, false);
+    }
+  }, []);
 
   const handleSubmit = async (values: any) => {
     try {
@@ -166,6 +146,18 @@ const Signup: React.FC = () => {
     }
   };
 
+  const languageMenuItems = languageOptions.map(lang => ({
+    key: lang.key,
+    label: (
+      <Space>
+        <span role="img" aria-label={lang.label}>
+          {lang.flag}
+        </span>
+        {lang.label}
+      </Space>
+    ),
+  }));
+
   return (
     <div className={styles.container}>
       <Helmet>
@@ -179,18 +171,32 @@ const Signup: React.FC = () => {
       </Helmet>
 
       {/* Top right controls */}
-      <div className={styles.topRightIcons}>
-        <Lang isDark={isDarkMode} />
-        <Button
-          className={styles.darkModeToggle}
-          type="text"
-          icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+      <FloatButton.Group
+        trigger="hover"
+        type="primary"
+        style={{ right: 24, bottom: 24 }}
+        icon={<SettingOutlined />}
+      >
+        <FloatButton
+          icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+          tooltip={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           onClick={toggleTheme}
-          style={{
-            color: isDarkMode ? 'white' : undefined,
-          }}
         />
-      </div>
+
+        <Dropdown
+          menu={{
+            items: languageMenuItems,
+            onClick: handleLanguageChange,
+            selectedKeys: [getLocale()],
+          }}
+          placement="bottomLeft"
+        >
+          <FloatButton
+            icon={<GlobalOutlined />}
+            tooltip="Change Language"
+          />
+        </Dropdown>
+      </FloatButton.Group>
 
       <div
         style={{
@@ -201,21 +207,29 @@ const Signup: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        <div className={styles.loginFormContainer}>
+        <div className={styles.loginFormContainer} style={{ padding: '40px' }}>
           <LoginForm
             contentStyle={{
               minWidth: 280,
               maxWidth: '75vw',
             }}
             logo={<img alt="logo" src="/logo.svg" />}
-            title={intl.formatMessage({
-              id: 'pages.signup.title',
-              defaultMessage: 'Create Account',
-            })}
-            subTitle={intl.formatMessage({
-              id: 'pages.signup.subtitle',
-              defaultMessage: 'Join us today!',
-            })}
+            title={
+              <span className={styles.darkText}>
+                {intl.formatMessage({
+                  id: 'pages.signup.title',
+                  defaultMessage: 'Create Account',
+                })}
+              </span>
+            }
+            subTitle={
+              <span className={styles.darkText}>
+                {intl.formatMessage({
+                  id: 'pages.signup.subtitle',
+                  defaultMessage: 'Join us today!',
+                })}
+              </span>
+            }
             onFinish={async (values) => {
               await handleSubmit(values);
             }}
@@ -321,7 +335,9 @@ const Signup: React.FC = () => {
                     />
                   ),
                 },
-                ({ getFieldValue }) => ({
+                ({
+                  getFieldValue
+                }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('password') === value) {
                       return Promise.resolve();

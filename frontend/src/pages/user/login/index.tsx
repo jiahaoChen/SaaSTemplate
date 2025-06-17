@@ -4,8 +4,10 @@ import {
   LockOutlined,
   FacebookOutlined,
   UserOutlined,
-  BulbOutlined,
-  BulbFilled,
+  SunOutlined,
+  GlobalOutlined,
+  MoonOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import GoogleColorIcon from '@/components/icons/GoogleColorIcon';
 import {
@@ -13,11 +15,10 @@ import {
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { FormattedMessage, Helmet, useIntl, useModel, Link } from '@umijs/max';
-import { SelectLang as CustomSelectLang } from '@/components';
-import { Alert, message, Button } from 'antd';
+import { FormattedMessage, Helmet, useIntl, useModel, Link, setLocale, getLocale } from '@umijs/max';
+import { Alert, message, Dropdown, FloatButton, Space } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -25,6 +26,17 @@ import { useTheme } from '@/contexts/ThemeContext';
 interface LoginStateType extends Partial<API.Token> {
   status?: string;
 }
+
+const languageOptions = [
+  { key: 'en-US', label: 'English', flag: '🇺🇸' },
+  { key: 'zh-CN', label: '简体中文', flag: '🇨🇨' },
+  { key: 'zh-TW', label: '繁體中文', flag: '🇹🇼' },
+  { key: 'ja-JP', label: '日本語', flag: '🇯🇵' },
+  { key: 'pt-BR', label: 'Português', flag: '🇧🇷' },
+  { key: 'id-ID', label: 'Bahasa Indonesia', flag: '🇮🇩' },
+  { key: 'fa-IR', label: 'فارسی', flag: '🇮🇷' },
+  { key: 'bn-BD', label: 'বাংলা', flag: '🇧🇩' },
+];
 
 const useStyles = createStyles(({ token }, isDark: boolean) => {
   return {
@@ -37,32 +49,6 @@ const useStyles = createStyles(({ token }, isDark: boolean) => {
       '&:hover': {
         color: token.colorPrimaryActive,
       },
-    },
-    lang: {
-      width: 42,
-      height: 42,
-      lineHeight: '42px',
-      borderRadius: token.borderRadius,
-      ':hover': {
-        backgroundColor: token.colorBgTextHover,
-      },
-      color: isDark ? 'white' : undefined,
-      '.anticon': {
-        color: isDark ? 'white' : undefined,
-      },
-      '.ant-dropdown-trigger': {
-        color: isDark ? 'white' : undefined,
-      },
-    },
-    darkModeToggle: {
-      zIndex: 1000,
-      borderRadius: '50%',
-      width: 42,
-      height: 42,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginLeft: 8,
     },
     container: {
       display: 'flex',
@@ -84,14 +70,6 @@ const useStyles = createStyles(({ token }, isDark: boolean) => {
     darkText: {
       color: isDark ? 'white' : undefined,
     },
-    topRightIcons: {
-      display: 'flex',
-      alignItems: 'center',
-      position: 'fixed',
-      top: 16,
-      right: 16,
-      zIndex: 1000,
-    },
   };
 });
 
@@ -103,16 +81,6 @@ const ActionIcons = ({ isDark }: { isDark: boolean }) => {
       <GoogleColorIcon key="GoogleColorIcon" className={styles.action} />
       <FacebookOutlined key="FacebookOutlined" className={styles.action} style={{ color: '#4267B2' }} />
     </>
-  );
-};
-
-const Lang = ({ isDark }: { isDark: boolean }) => {
-  const { styles } = useStyles(isDark);
-
-  return (
-    <div className={styles.lang} data-lang>
-      {CustomSelectLang && <CustomSelectLang isDark={isDark} />}
-    </div>
   );
 };
 
@@ -149,6 +117,18 @@ const Login: React.FC = () => {
       });
     }
   };
+
+  const handleLanguageChange = ({ key }: { key: string }) => {
+    setLocale(key, false);
+    localStorage.setItem('app-language', key);
+  };
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('app-language');
+    if (savedLanguage) {
+      setLocale(savedLanguage, false);
+    }
+  }, []);
 
   const handleSubmit = async (values: API.BodyLoginLoginAccessToken) => {
     try {
@@ -187,25 +167,50 @@ const Login: React.FC = () => {
   };
   const { status } = userLoginState;
 
+  const languageMenuItems = languageOptions.map(lang => ({
+    key: lang.key,
+    label: (
+      <Space>
+        <span role="img" aria-label={lang.label}>
+          {lang.flag}
+        </span>
+        {lang.label}
+      </Space>
+    ),
+  }));
+
   return (
     <div className={styles.container}>
       <Helmet>
         <title>{` ${Settings.title || ''}`}</title>
       </Helmet>
 
-      <div className={styles.topRightIcons}>
-        {/* Dark Mode Toggle */}
-        <Button
-          className={styles.darkModeToggle}
-          type="text"
-          icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+      <FloatButton.Group
+        trigger="hover"
+        type="primary"
+        style={{ right: 24, bottom: 24 }}
+        icon={<SettingOutlined />}
+      >
+        <FloatButton
+          icon={isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+          tooltip={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           onClick={toggleTheme}
-          title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          style={{ color: isDarkMode ? 'white' : undefined }}
         />
 
-        <Lang isDark={isDarkMode} />
-      </div>
+        <Dropdown
+          menu={{
+            items: languageMenuItems,
+            onClick: handleLanguageChange,
+            selectedKeys: [getLocale()],
+          }}
+          placement="bottomLeft"
+        >
+          <FloatButton
+            icon={<GlobalOutlined />}
+            tooltip="Change Language"
+          />
+        </Dropdown>
+      </FloatButton.Group>
 
       <div
         style={{
